@@ -1,0 +1,2924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Attention Deficit | FP&A Summit Boston</title>
+  <style>
+    :root {
+      --bg-primary: #060a12;
+      --bg-secondary: #0e1628;
+      --bg-card: rgba(20, 31, 54, 0.86);
+      --bg-card-solid: #16223b;
+      --bg-glass: rgba(12, 19, 34, 0.82);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #818cf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #c084fc;
+      --border-color: rgba(148, 163, 184, 0.2);
+      --glow-blue: 0 0 32px rgba(56, 189, 248, 0.24);
+      --shadow: 0 22px 48px -14px rgba(0, 0, 0, 0.72);
+    }
+
+    body.light-mode {
+      --bg-primary: #f1f5f9;
+      --bg-secondary: #e2e8f0;
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --bg-card-solid: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.9);
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --accent-blue: #0284c7;
+      --accent-indigo: #4f46e5;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      --accent-purple: #7e22ce;
+      --border-color: rgba(15, 23, 42, 0.15);
+      --glow-blue: 0 10px 28px rgba(2, 132, 199, 0.15);
+      --shadow: 0 16px 36px -12px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background-color: var(--bg-primary);
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.09) 0%, transparent 42%),
+        radial-gradient(circle at 90% 85%, rgba(129, 140, 248, 0.09) 0%, transparent 42%),
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      color: var(--text-primary);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Presenter HUD */
+    header.hud-bar {
+      height: 50px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 0.85rem;
+      z-index: 20;
+      flex-shrink: 0;
+      transition: margin-top 0.3s ease, opacity 0.3s ease;
+    }
+
+    body.hud-hidden header.hud-bar {
+      margin-top: -50px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .hud-left, .hud-center, .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .timer-pill {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border-color);
+      padding: 5px 14px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .step-badge-hud {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--accent-blue);
+      color: var(--accent-blue);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .hud-btn {
+      background: var(--bg-card-solid);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .hud-btn:hover { border-color: var(--accent-blue); }
+    .hud-btn.active {
+      background: var(--accent-indigo);
+      border-color: var(--accent-indigo);
+      color: #fff;
+    }
+
+    /* Progress Track */
+    .progress-track {
+      height: 4px;
+      background: var(--bg-secondary);
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-indigo), var(--accent-emerald));
+      width: 5%;
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 0 12px var(--accent-blue);
+    }
+
+    /* Balanced Stage Container */
+    main.stage {
+      flex: 1;
+      position: relative;
+      overflow-y: auto;
+      padding: 24px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1580px;
+      margin: auto;
+      flex-direction: column;
+      gap: 20px;
+      animation: slideEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .slide-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    @keyframes slideEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Progressive Clicker Build States */
+    .build-item {
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.3s ease,
+                  border-color 0.3s ease,
+                  filter 0.3s ease;
+    }
+
+    .build-item.step-future {
+      opacity: 0.16;
+      transform: translateY(6px) scale(0.992);
+      filter: grayscale(80%);
+      pointer-events: none;
+    }
+
+    .build-item.step-past {
+      opacity: 0.92;
+      transform: translateY(0) scale(1);
+      filter: none;
+    }
+
+    .build-item.step-current {
+      opacity: 1;
+      transform: translateY(0) scale(1.006);
+      border-color: var(--accent-blue) !important;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.55), var(--glow-blue), var(--shadow) !important;
+      filter: none;
+      z-index: 5;
+    }
+
+    /* STAGE TYPOGRAPHY SCALE */
+    .slide-kicker {
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: clamp(0.88rem, 1vw, 1rem);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1.slide-title {
+      font-size: clamp(2.1rem, 2.85vw, 3.05rem);
+      line-height: 1.12;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    p.slide-subtitle {
+      font-size: clamp(1.08rem, 1.28vw, 1.28rem);
+      color: var(--text-secondary);
+      max-width: 1320px;
+      line-height: 1.44;
+    }
+
+    /* Layout Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; align-items: stretch; }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px 26px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-title {
+      font-size: clamp(1.2rem, 1.4vw, 1.45rem);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      line-height: 1.25;
+    }
+
+    .body-copy {
+      font-size: clamp(1.02rem, 1.15vw, 1.18rem);
+      color: var(--text-secondary);
+      line-height: 1.48;
+    }
+
+    .body-copy strong {
+      color: var(--text-primary);
+    }
+
+    /* ================================================================= */
+    /* SLIDE 1: EXPANSIVE BENTO COVER                                    */
+    /* ================================================================= */
+    .cover-hero-banner {
+      background: linear-gradient(135deg, rgba(22, 35, 62, 0.95) 0%, rgba(12, 19, 36, 0.98) 100%);
+      border: 1px solid var(--border-color);
+      border-left: 6px solid var(--accent-blue);
+      border-radius: 18px;
+      padding: 28px 34px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 32px;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+
+    .cover-meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .cover-pill {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .track-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .track-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .track-item strong {
+      font-size: clamp(1.04rem, 1.18vw, 1.2rem);
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .track-item span {
+      font-size: clamp(0.94rem, 1.05vw, 1.06rem);
+      color: var(--text-secondary);
+      line-height: 1.4;
+      display: block;
+    }
+
+    .roadmap-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px 22px;
+    }
+
+    .roadmap-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.96rem;
+      line-height: 1.35;
+    }
+
+    /* ================================================================= */
+    /* SLIDE 2: 40-SLIDE SORTER MOCKUP & LIVE APP MOCKUP                 */
+    /* ================================================================= */
+    .wireframe-window {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .wireframe-bar {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .win-dots { display: flex; gap: 6px; }
+    .win-dots span { width: 10px; height: 10px; border-radius: 50%; }
+
+    .ppt-sorter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .mini-ppt-slide {
+      background: #16223b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 10px;
+      height: 82px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .mini-ppt-slide.lost-slide {
+      border: 2px solid var(--accent-rose);
+      background: rgba(244, 63, 94, 0.16);
+      box-shadow: 0 0 18px rgba(244, 63, 94, 0.35);
+    }
+
+    .mini-ppt-header {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      padding-bottom: 3px;
+    }
+
+    .overload-fill-bar, .lever-fill-1, .lever-fill-2 {
+      width: 0%;
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .overload-fill-bar { background: linear-gradient(90deg, #f59e0b, #f43f5e); }
+
+    /* ================================================================= */
+    /* SLIDE 3: ONE-SHOT RADIAL GAUGES & HIGH-CONTRAST OODA TABLE        */
+    /* ================================================================= */
+    .gauge-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 20px;
+    }
+
+    .gauge-svg {
+      width: 86px;
+      height: 86px;
+      flex-shrink: 0;
+    }
+
+    .gauge-ring-anim {
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mult-bar-anim {
+      transition: height 1.1s cubic-bezier(0.22, 1, 0.36, 1), y 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .ooda-loop-Diagram-box {
+      grid-column: span 2;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ooda-track-outer {
+      border: 1.5px dashed rgba(244, 63, 94, 0.6);
+      background: rgba(244, 63, 94, 0.07);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ooda-track-inner {
+      border: 2px solid var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.11);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      box-shadow: 0 0 22px rgba(16, 185, 129, 0.14);
+    }
+
+    .ooda-node-chain {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ooda-node-pill {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: var(--text-primary);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .ooda-row {
+      display: grid;
+      grid-template-columns: 112px 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+      align-items: stretch;
+      border-radius: 10px;
+      padding: 4px;
+      border: 1px solid transparent;
+    }
+
+    .ooda-stage-pill {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-blue);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 12px;
+    }
+
+    .ooda-stage-pill span {
+      font-size: 0.74rem;
+      color: var(--accent-blue);
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .ooda-stage-pill strong {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+    }
+
+    .ooda-cell {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.94rem;
+      line-height: 1.38;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .ooda-cell.legacy {
+      background: var(--bg-secondary);
+      border-left: 3px solid var(--accent-rose);
+      color: var(--text-secondary);
+    }
+
+    .ooda-cell.frontier {
+      background: rgba(16, 185, 129, 0.09);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-left: 3px solid var(--accent-emerald);
+      color: var(--text-primary);
+    }
+
+    .ooda-cell strong {
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.98rem;
+    }
+
+    /* ================================================================= */
+    /* SLIDE 4: 4 ERAS WITH LARGE TYPOGRAPHY & BANDWIDTH BARS            */
+    /* ================================================================= */
+    .era-col-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-top: 5px solid var(--accent-blue);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .era-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .time-split-bar {
+      height: 26px;
+      width: 100%;
+      background: var(--bg-secondary);
+      border-radius: 99px;
+      overflow: hidden;
+      display: flex;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .time-prep, .time-strat {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 0%;
+      transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .time-prep { background: var(--accent-rose); }
+    .time-strat { background: var(--accent-emerald); }
+
+    /* ================================================================= */
+    /* SLIDE 6: FACTORY PIPELINE                                         */
+    /* ================================================================= */
+    .factory-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .roi-pill-group { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .roi-pill {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .roi-pill.secondary {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      position: relative;
+    }
+
+    .stage-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stage-card.gen-ai { border-top: 5px solid var(--accent-purple); }
+    .stage-card.det-excel { border-top: 5px solid var(--accent-emerald); }
+    .stage-card.compiler-ai {
+      border-top: 5px solid var(--accent-blue);
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.1) 0%, var(--bg-card) 100%);
+    }
+
+    .stage-card:not(:last-child)::after {
+      content: "➔";
+      position: absolute;
+      right: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      background: var(--bg-card-solid);
+      border: 1px solid var(--accent-blue);
+      color: var(--accent-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      z-index: 6;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+    }
+
+    .mini-flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      gap: 4px;
+    }
+
+    .engine-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    .engine-tag.purple { background: rgba(192, 132, 252, 0.16); color: #d8b4fe; border: 1px solid rgba(192, 132, 252, 0.45); }
+    .engine-tag.emerald { background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.45); }
+    .engine-tag.blue { background: rgba(56, 189, 248, 0.16); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.45); }
+
+    .stage-step-badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .stage-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .stage-body {
+      font-size: 0.96rem;
+      color: var(--text-secondary);
+      line-height: 1.44;
+    }
+
+    .sub-module {
+      background: var(--bg-secondary);
+      border-left: 3px solid var(--accent-emerald);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.38;
+      margin-bottom: 8px;
+    }
+
+    .sub-module strong {
+      color: var(--text-primary);
+      display: block;
+      font-size: 0.94rem;
+      margin-bottom: 2px;
+    }
+
+    .stage-output-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .stage-output-box span {
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      font-size: 0.74rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .portfolio-ribbon {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px 22px;
+    }
+
+    .portfolio-ribbon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .portfolio-mini-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-indigo);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .portfolio-mini-card h4 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .portfolio-mini-card p {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.42;
+    }
+
+    /* ================================================================= */
+    /* SLIDE 7: BOUNDED LAYER STACK + ARCHITECTURE ROWS                  */
+    /* ================================================================= */
+    .arch-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .stack-plate-visual {
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-secondary);
+      text-align: center;
+      transition: all 0.35s ease;
+    }
+
+    .arch-stack-row {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--accent-blue);
+      border-radius: 14px;
+      padding: 16px 22px;
+      display: grid;
+      grid-template-columns: 250px 1fr 340px;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .arch-stack-proof {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: var(--text-secondary);
+    }
+
+    .arch-stack-proof strong { color: var(--text-primary); }
+
+    /* Sliders & Guardrail Banners */
+    .sim-control { margin-bottom: 12px; }
+    .sim-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.96rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-blue);
+      cursor: pointer;
+    }
+
+    .guardrail-banner {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .guardrail-pass {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    .guardrail-fail {
+      background: rgba(244, 63, 94, 0.16);
+      border: 1px solid var(--accent-rose);
+      color: var(--accent-rose);
+    }
+
+    .btn-launch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-blue);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 20px;
+      color: var(--text-secondary);
+      line-height: 1.46;
+      font-size: clamp(0.98rem, 1.1vw, 1.12rem);
+    }
+
+    .bullet-list li strong { color: var(--text-primary); }
+    .bullet-list li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-weight: bold;
+    }
+
+    /* Speaker Notes Drawer */
+    .notes-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 250px;
+      background: #050811;
+      border-top: 2px solid var(--accent-indigo);
+      color: #e2e8f0;
+      padding: 18px 48px;
+      z-index: 40;
+      transform: translateY(100%);
+      transition: transform 0.25s ease;
+      overflow-y: auto;
+    }
+
+    .notes-drawer.open { transform: translateY(0); }
+
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    .notes-body {
+      font-size: 1.02rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    /* Live Iframe Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 16, 0.9);
+      backdrop-filter: blur(8px);
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      padding: 18px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-bar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 10px 18px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-iframe {
+      flex: 1;
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      background: #fff;
+    }
+
+    /* Blackout Overlay */
+    .blackout-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .blackout-overlay.active { display: flex; }
+
+    .slide-footer {
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 1200px) {
+      .grid-2, .grid-3, .grid-4, .pipeline-flow, .ooda-row, .arch-layout, .arch-stack-row, .cover-hero-banner, .roadmap-strip, .ppt-sorter-grid {
+        grid-template-columns: 1fr;
+      }
+      .stage-card:not(:last-child)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Presenter HUD -->
+  <header class="hud-bar">
+    <div class="hud-left">
+      <span class="badge-live"><span class="pulse-dot"></span>FP&A Summit Boston</span>
+      <span style="font-weight:600; color:var(--text-secondary);">Prakrit Nepal • Director of FP&A</span>
+    </div>
+
+    <div class="hud-center">
+      <div class="timer-pill" onclick="toggleTimer()" title="Click or press 'T' to Start/Pause 45-min timer">
+        <span id="timer-status">▶</span>
+        <span id="timer-display">00:00 / 45:00</span>
+        <span style="color:var(--accent-blue); font-size:0.78rem;" id="slide-pace">Presenter Pacing HUD</span>
+      </div>
+      <span class="step-badge-hud" id="slide-counter">Slide 1 / 10 • Step 1 / 2</span>
+    </div>
+
+    <div class="hud-right">
+      <button class="hud-btn" onclick="prevStepOrSlide()" title="Clicker Back / ← / PageUp">← Back</button>
+      <button class="hud-btn" onclick="nextStepOrSlide()" title="Clicker Next / → / PageDown / Space">Next →</button>
+      <button class="hud-btn" id="btn-fullscreen" onclick="toggleFullScreen()" title="Full Screen (F)">⛶ Full (F)</button>
+      <button class="hud-btn" onclick="toggleHud()" title="Hide Top Bar (H)">Hide Bar (H)</button>
+      <button class="hud-btn" id="btn-notes" onclick="toggleNotes()" title="Speaker Notes (N)">Notes (N)</button>
+      <button class="hud-btn" onclick="openDemoModal('https://prakritnepal-git.github.io/capexanalyzer/')" title="Press [1] CapEx App">[1] CapEx</button>
+      <button class="hud-btn" onclick="openDemoModal('https://prakritnepal-git.github.io/Q226_competitive_analysis/')" title="Press [2] Competitive App">[2] Comp</button>
+      <button class="hud-btn" onclick="toggleTheme()" title="Light/Dark Mode (L)">Theme (L)</button>
+    </div>
+  </header>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+
+  <!-- Main Slide Stage -->
+  <main class="stage">
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 1 (COVER): EXECUTIVE OVERVIEW — BALANCED BENTO ARCHITECTURE -->
+    <!-- ================================================================= -->
+    <section class="slide active" data-pace="Target: Min 00–03 (Cover & Overview)" data-steps="2">
+      <!-- Top Hero Banner -->
+      <div class="cover-hero-banner">
+        <div>
+          <div class="slide-kicker">FP&amp;A Summit Boston</div>
+          <h1 class="slide-title" style="margin:6px 0 12px 0;">
+            The Attention Deficit: Engineering AI-Guided Decision Ecosystems Over Static Reports
+          </h1>
+          <p class="slide-subtitle">
+            Bridging the gap between <strong>strategic finance vision</strong> and <strong>tactical engineering</strong>: how FP&amp;A leaders replace passive 40-page slide decks and multi-tab workbooks with interactive, guardrailed decision applications.
+          </p>
+          <div class="cover-meta-pills">
+            <span class="cover-pill" style="border-color:var(--accent-blue);"><span style="color:var(--accent-blue);">●</span> Prakrit Nepal • Director of FP&amp;A, Connection</span>
+            <span class="cover-pill"><span style="color:var(--accent-emerald);">⚡</span> Live HTML Application (Zero PowerPoint)</span>
+            <span class="cover-pill"><span style="color:var(--accent-purple);">🎯</span> Thought Leadership + Live Production Demos</span>
+          </div>
+        </div>
+
+        <!-- Right Hero Graphic: High-Contrast Architectural Blueprint SVG -->
+        <div style="background:rgba(6, 10, 18, 0.6); border:1px solid var(--border-color); border-radius:16px; padding:16px;">
+          <svg viewBox="0 0 380 170" width="100%" height="170">
+            <rect x="8" y="16" width="96" height="38" rx="6" fill="#1e293b" stroke="#f43f5e" stroke-width="1.5"/>
+            <text x="56" y="33" fill="#f43f5e" font-size="10" font-weight="800" text-anchor="middle">40-PAGE DECK</text>
+            <text x="56" y="46" fill="#cbd5e1" font-size="8.5" text-anchor="middle">Cognitive Overload</text>
+
+            <rect x="8" y="66" width="96" height="38" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+            <text x="56" y="83" fill="#f59e0b" font-size="10" font-weight="800" text-anchor="middle">15-TAB EXCEL</text>
+            <text x="56" y="96" fill="#cbd5e1" font-size="8.5" text-anchor="middle">Manual Ticket Queue</text>
+
+            <rect x="8" y="116" width="96" height="38" rx="6" fill="#1e293b" stroke="#c084fc" stroke-width="1.5"/>
+            <text x="56" y="133" fill="#c084fc" font-size="10" font-weight="800" text-anchor="middle">TRANSCRIPTS</text>
+            <text x="56" y="146" fill="#cbd5e1" font-size="8.5" text-anchor="middle">Unstructured Text</text>
+
+            <path d="M 106 35 L 148 76 M 106 85 L 148 85 M 106 135 L 148 94" stroke="#38bdf8" stroke-width="2" opacity="0.85"/>
+
+            <rect x="148" y="38" width="98" height="94" rx="12" fill="#16223b" stroke="#38bdf8" stroke-width="2"/>
+            <text x="197" y="64" fill="#38bdf8" font-size="10.5" font-weight="800" text-anchor="middle">AI AGENTS</text>
+            <text x="197" y="80" fill="#f8fafc" font-size="9" font-weight="bold" text-anchor="middle">+ DETERMINISTIC</text>
+            <text x="197" y="95" fill="#10b981" font-size="10" font-weight="800" text-anchor="middle">GUARDRAILS</text>
+            <rect x="163" y="106" width="68" height="15" rx="4" fill="rgba(16,185,129,0.22)"/>
+            <text x="197" y="117" fill="#34d399" font-size="8" font-weight="bold" text-anchor="middle">HTML COMPILER</text>
+
+            <path d="M 248 85 L 274 85" stroke="#10b981" stroke-width="2.5"/>
+            <polygon points="272,80 280,85 272,90" fill="#10b981"/>
+
+            <rect x="282" y="24" width="90" height="122" rx="10" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="2"/>
+            <text x="327" y="46" fill="#10b981" font-size="10.5" font-weight="800" text-anchor="middle">DECISION APP</text>
+            <rect x="294" y="58" width="66" height="7" rx="3" fill="#38bdf8"/>
+            <rect x="294" y="71" width="50" height="7" rx="3" fill="#818cf8"/>
+            <rect x="298" y="98" width="13" height="22" rx="2" fill="#38bdf8"/>
+            <rect x="316" y="89" width="13" height="31" rx="2" fill="#10b981"/>
+            <rect x="334" y="80" width="13" height="40" rx="2" fill="#10b981"/>
+            <text x="327" y="136" fill="#f8fafc" font-size="8.5" font-weight="bold" text-anchor="middle">Self-Service UX</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Expansive 2-Column Dual-Track Grid -->
+      <div class="grid-2">
+        <!-- STEP 1: TRACK I — STRATEGIC THOUGHT LEADERSHIP -->
+        <div class="card build-item" data-step="1" style="border-top: 5px solid var(--accent-indigo);">
+          <div class="card-title">
+            <span style="color:var(--accent-blue);">Track I • Strategic Thought Leadership</span>
+            <span class="engine-tag blue">The "Why" &amp; "Where"</span>
+          </div>
+          <div class="track-item">
+            <div class="track-num" style="background:rgba(56,189,248,0.16); color:var(--accent-blue);">01</div>
+            <div>
+              <strong>Diagnosing the Executive Attention Deficit</strong>
+              <span>Why static dashboards and 40-page slide decks create cognitive overload and stall the executive OODA loop.</span>
+            </div>
+          </div>
+          <div class="track-item">
+            <div class="track-num" style="background:rgba(129,140,248,0.16); color:var(--accent-indigo);">02</div>
+            <div>
+              <strong>The Evolution to FP&amp;A 4.0 (Gartner 2030 Vision)</strong>
+              <span>Why only 15% of consulting-style teams scale vs. the 3x–4x effectiveness multiplier of tool-first models.</span>
+            </div>
+          </div>
+          <div class="track-item">
+            <div class="track-num" style="background:rgba(192,132,252,0.16); color:var(--accent-purple);">03</div>
+            <div>
+              <strong>The New Mandate: Ecosystem Architects &amp; Coaches</strong>
+              <span>Shifting from ticket-takers in every meeting to product owners who set guardrails and coach financial acumen.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: TRACK II — TACTICAL EXECUTION & ENGINEERING -->
+        <div class="card build-item" data-step="2" style="border-top: 5px solid var(--accent-emerald);">
+          <div class="card-title">
+            <span style="color:var(--accent-emerald);">Track II • Tactical Execution &amp; Engineering</span>
+            <span class="engine-tag emerald">The "How" &amp; "What"</span>
+          </div>
+          <div class="track-item">
+            <div class="track-num" style="background:rgba(16,185,129,0.16); color:var(--accent-emerald);">01</div>
+            <div>
+              <strong>Live Production Web App Demonstrations</strong>
+              <span>Upgrading a multi-tab DCF (`CapEx Analyzer`) and a 40-page deck (`Competitive Analysis`) into interactive websites.</span>
+            </div>
+          </div>
+          <div class="track-item">
+            <div class="track-num" style="background:rgba(56,189,248,0.16); color:var(--accent-blue);">02</div>
+            <div>
+              <strong>Inside the Factory: Multi-Agent + Excel Pipeline</strong>
+              <span>How 2 Copilot Agents + deterministic Excel templates save 12–15 hrs/qtr and scale across 5 FP&amp;A domains.</span>
+            </div>
+          </div>
+          <div class="track-item">
+            <div class="track-num" style="background:rgba(245,158,11,0.16); color:var(--accent-amber);">03</div>
+            <div>
+              <strong>Algorithmic Guardrails &amp; Execution Playbook</strong>
+              <span>Preventing executive "slider-gaming," governing confidential payloads, and your 30-day implementation sprint.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Session Flow Strip -->
+      <div class="roadmap-strip build-item" data-step="2">
+        <div class="roadmap-step">
+          <span class="stage-step-badge" style="background:var(--accent-indigo); color:#fff;">Pillar 01</span>
+          <div><strong>The Attention Deficit &amp; FP&amp;A 4.0</strong><br/><span style="color:var(--text-secondary);">Scalability Wall &amp; OODA Velocity</span></div>
+        </div>
+        <div class="roadmap-step">
+          <span class="stage-step-badge" style="background:var(--accent-blue); color:#060a12;">Pillar 02</span>
+          <div><strong>Live Decision App Walkthroughs</strong><br/><span style="color:var(--text-secondary);">CapEx Model &amp; Competitive Micro-Site</span></div>
+        </div>
+        <div class="roadmap-step">
+          <span class="stage-step-badge" style="background:var(--accent-purple); color:#060a12;">Pillar 03</span>
+          <div><strong>Inside the Multi-Agent Factory</strong><br/><span style="color:var(--text-secondary);">4-Step Pipeline &amp; 4-Layer Ecosystem</span></div>
+        </div>
+        <div class="roadmap-step">
+          <span class="stage-step-badge" style="background:var(--accent-emerald); color:#060a12;">Pillar 04</span>
+          <div><strong>Operating Model &amp; Governance</strong><br/><span style="color:var(--text-secondary);">Product Pods, Guardrails &amp; Action Plan</span></div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Clicker Controls: [Next / PageDown / →] Advances Build Step &amp; Slide • [F] Fullscreen • [N] Speaker Script</span>
+        <span>Slide 1 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 2: DETAILED 40-SLIDE MOCKUP ("LOST BY PAGE 12") VS APP      -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 03–06" data-steps="2">
+      <div class="slide-header">
+        <div class="slide-kicker">01 • The Meta-Hook • Medium Is the Message</div>
+        <h1 class="slide-title">Upgrading From Static Reports to Interactive Decision Applications</h1>
+        <p class="slide-subtitle">
+          Executives face information abundance while finance suffers from attention scarcity. We don't need prettier slides—we need to replace passive reports with interactive decision products.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <!-- STEP 1: Detailed 40-Slide Sorter Mockup -->
+        <div class="card build-item" data-step="1" style="border-top: 5px solid var(--accent-rose);">
+          <div class="card-title">
+            <span style="color:var(--accent-rose);">1. The Legacy Reporting Trap (Static 40-Page Deck)</span>
+            <span class="engine-tag" style="background:rgba(244,63,94,0.15); color:var(--accent-rose); border:1px solid var(--accent-rose);">Cognitive Overload</span>
+          </div>
+
+          <div class="wireframe-window">
+            <div class="wireframe-bar">
+              <div class="win-dots">
+                <span style="background:#f43f5e;"></span>
+                <span style="background:#f59e0b;"></span>
+                <span style="background:#10b981;"></span>
+              </div>
+              <span>Q2_Executive_Review_v14_40Slides.pptx — Slide Sorter</span>
+            </div>
+
+            <div style="padding:18px; display:flex; flex-direction:column; gap:16px;">
+              <!-- 8 Detailed Miniature Slide Mockups -->
+              <div class="ppt-sorter-grid">
+                <div class="mini-ppt-slide">
+                  <div class="mini-ppt-header"><span>SLIDE 01</span><span>Exec Summary</span></div>
+                  <div style="height:8px; width:75%; background:#475569; border-radius:2px;"></div>
+                  <div style="height:26px; width:100%; background:#1e293b; border-radius:3px; border-left:3px solid #38bdf8;"></div>
+                </div>
+
+                <div class="mini-ppt-slide">
+                  <div class="mini-ppt-header"><span>SLIDE 04</span><span>P&amp;L Variance</span></div>
+                  <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:3px;">
+                    <div style="height:7px; background:#334155;"></div><div style="height:7px; background:#334155;"></div><div style="height:7px; background:#334155;"></div><div style="height:7px; background:#334155;"></div>
+                    <div style="height:7px; background:#475569;"></div><div style="height:7px; background:#475569;"></div><div style="height:7px; background:#f43f5e;"></div><div style="height:7px; background:#475569;"></div>
+                  </div>
+                  <div style="font-size:0.7rem; color:var(--text-muted);">42 Rows × 14 Cols</div>
+                </div>
+
+                <div class="mini-ppt-slide">
+                  <div class="mini-ppt-header"><span>SLIDE 08</span><span>GM Waterfall</span></div>
+                  <div style="display:flex; align-items:flex-end; gap:5px; height:36px;">
+                    <div style="width:20%; height:90%; background:#38bdf8;"></div>
+                    <div style="width:20%; height:45%; background:#10b981; margin-bottom:40%;"></div>
+                    <div style="width:20%; height:50%; background:#f43f5e; margin-bottom:25%;"></div>
+                    <div style="width:20%; height:65%; background:#818cf8;"></div>
+                  </div>
+                </div>
+
+                <!-- LOST BY PAGE 12 HIGHLIGHT -->
+                <div class="mini-ppt-slide lost-slide">
+                  <div class="mini-ppt-header" style="color:var(--accent-rose);"><span>SLIDE 12</span><span>⚠️ DROPOFF</span></div>
+                  <div style="font-size:0.84rem; font-weight:800; color:#fff; line-height:1.15; text-align:center;">
+                    LOST BY PAGE 12
+                  </div>
+                  <div style="font-size:0.7rem; color:#fda4af; text-align:center;">
+                    Thread Breaks
+                  </div>
+                </div>
+
+                <div class="mini-ppt-slide" style="opacity:0.65;">
+                  <div class="mini-ppt-header"><span>SLIDE 19</span><span>SG&amp;A Split</span></div>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <div style="width:28px; height:28px; border-radius:50%; border:4px solid #f59e0b; border-right-color:#818cf8;"></div>
+                    <div style="flex:1; height:20px; background:#1e293b;"></div>
+                  </div>
+                </div>
+
+                <div class="mini-ppt-slide" style="opacity:0.55;">
+                  <div class="mini-ppt-header"><span>SLIDE 26</span><span>Peer Matrix</span></div>
+                  <div style="height:32px; background:#1e293b; border:1px dashed #475569; border-radius:4px;"></div>
+                </div>
+
+                <div class="mini-ppt-slide" style="opacity:0.45;">
+                  <div class="mini-ppt-header"><span>SLIDE 33</span><span>CapEx Table</span></div>
+                  <div style="height:32px; background:#1e293b; border-radius:4px;"></div>
+                </div>
+
+                <div class="mini-ppt-slide" style="opacity:0.4;">
+                  <div class="mini-ppt-header"><span>SLIDE 40</span><span>Appendix Z</span></div>
+                  <div style="font-size:0.74rem; color:var(--text-muted); text-align:center; padding-top:8px;">Unread Tables</div>
+                </div>
+              </div>
+
+              <!-- One-Time Animated Overload Meter -->
+              <div style="background:var(--bg-primary); border:1px solid rgba(244,63,94,0.45); border-radius:12px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:18px;">
+                <div style="flex:1;">
+                  <div style="display:flex; justify-content:space-between; font-size:0.88rem; font-weight:800; margin-bottom:6px;">
+                    <span style="color:var(--text-secondary);">EXECUTIVE COGNITIVE OVERLOAD</span>
+                    <span style="color:var(--accent-rose);">92% OVERLOAD</span>
+                  </div>
+                  <div style="height:14px; background:#1e293b; border-radius:99px; overflow:hidden;">
+                    <div class="overload-fill-bar" id="s2-overload-bar"></div>
+                  </div>
+                </div>
+                <div style="border-left:1px solid var(--border-color); padding-left:18px; text-align:right;">
+                  <div style="font-size:0.8rem; color:var(--text-secondary);">"What-If" Latency</div>
+                  <div style="font-size:1.05rem; font-weight:800; color:var(--accent-rose);">Multi-Day Queue</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-3" style="gap:12px; text-align:center;">
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Executive UX</div>
+              <div style="font-size:1.08rem; font-weight:800; color:var(--accent-rose);">Passive Skimming</div>
+            </div>
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Scenario Speed</div>
+              <div style="font-size:1.08rem; font-weight:800; color:var(--accent-amber);">Days / Email Queue</div>
+            </div>
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Quarterly Prep Drag</div>
+              <div style="font-size:1.08rem; font-weight:800; color:var(--accent-rose);">12–15+ Hrs Lost</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Engineered HTML Decision App Mockup -->
+        <div class="card build-item" data-step="2" style="border-top: 5px solid var(--accent-emerald);">
+          <div class="card-title">
+            <span style="color:var(--accent-emerald);">2. Why This Keynote Is an HTML App (Engineered Ecosystem)</span>
+            <span class="engine-tag emerald">Active Self-Service</span>
+          </div>
+
+          <div class="wireframe-window" style="border-color:rgba(16,185,129,0.45);">
+            <div class="wireframe-bar">
+              <div class="win-dots">
+                <span style="background:#f43f5e;"></span>
+                <span style="background:#f59e0b;"></span>
+                <span style="background:#10b981;"></span>
+              </div>
+              <span style="color:var(--accent-blue);">https://decision-ecosystem.internal/interactive-app.html</span>
+            </div>
+
+            <div style="padding:18px; display:grid; grid-template-columns: 1.15fr 1fr; gap:18px; align-items:stretch;">
+              <!-- Left Interactive Levers Mockup -->
+              <div style="background:var(--bg-primary); border:1px solid rgba(56,189,248,0.35); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+                <div>
+                  <div style="font-size:0.84rem; font-weight:800; color:var(--accent-blue); margin-bottom:12px;">
+                    SELF-SERVICE COMMERCIAL LEVERS
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary); margin-bottom:5px;">
+                    <span>CapEx Phasing / Volume</span><strong style="color:var(--accent-blue);">$1.2M</strong>
+                  </div>
+                  <div style="height:10px; background:#334155; border-radius:99px; margin-bottom:14px; overflow:hidden;">
+                    <div class="lever-fill-1" id="s2-lever-1" style="background:var(--accent-blue);"></div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--text-secondary); margin-bottom:5px;">
+                    <span>Sales / Pre-Sales / Tech Split</span><strong style="color:var(--accent-indigo);">45 / 25 / 30</strong>
+                  </div>
+                  <div style="height:10px; background:#334155; border-radius:99px; overflow:hidden;">
+                    <div class="lever-fill-2" id="s2-lever-2" style="background:var(--accent-indigo);"></div>
+                  </div>
+                </div>
+
+                <div style="background:rgba(16,185,129,0.14); border:1px solid rgba(16,185,129,0.4); border-radius:8px; padding:10px; font-size:0.88rem; font-weight:700; color:var(--accent-emerald); text-align:center;">
+                  🔒 Corporate WACC &amp; Margin Floors Locked
+                </div>
+              </div>
+
+              <!-- Right Live Output Chart -->
+              <div style="background:var(--bg-primary); border:1px solid rgba(16,185,129,0.45); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; text-align:center;">
+                <div style="font-size:0.84rem; font-weight:800; color:var(--accent-emerald);">REAL-TIME COMMERCIAL IMPACT</div>
+                <svg viewBox="0 0 160 88" width="100%" height="96">
+                  <line x1="10" y1="76" x2="150" y2="76" stroke="#334155" stroke-width="1.5"/>
+                  <rect id="s2-bar-1" x="20" y="76" width="22" height="0" rx="3" fill="#38bdf8" class="mult-bar-anim"/>
+                  <rect id="s2-bar-2" x="52" y="76" width="22" height="0" rx="3" fill="#38bdf8" class="mult-bar-anim"/>
+                  <rect id="s2-bar-3" x="84" y="76" width="22" height="0" rx="3" fill="#10b981" class="mult-bar-anim"/>
+                  <rect id="s2-bar-4" x="116" y="76" width="22" height="0" rx="3" fill="#10b981" class="mult-bar-anim"/>
+                </svg>
+                <div style="font-size:1.05rem; font-weight:800; color:var(--accent-emerald);">21.4% IRR • AUTO-APPROVED</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-3" style="gap:12px; text-align:center;">
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Executive UX</div>
+              <div style="font-size:1.08rem; font-weight:800; color:var(--accent-blue);">Zero-Install App</div>
+            </div>
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Scenario Speed</div>
+              <div style="font-size:1.08rem; font-weight:800; color:var(--accent-emerald);">Real-Time (&lt;10s)</div>
+            </div>
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">FP&amp;A Mandate</div>
+              <div style="font-size:1.08rem; font-weight:800; color:var(--accent-indigo);">Architect &amp; Coach</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Thesis: Stop sending static numbers that demand interpretation—start engineering interactive tools that drive decisions</span>
+        <span>Slide 2 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 3: ONE-SHOT ANIMATED GAUGES & OODA LOOP (5 CLICKER STEPS)   -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 06–11" data-steps="5">
+      <div class="slide-header">
+        <div class="slide-kicker">02 • Empirical Diagnosis: Information Abundance vs. Attention Scarcity</div>
+        <h1 class="slide-title">Static Reporting & "Consulting-Style" FP&A Hit a Scalability Wall</h1>
+        <p class="slide-subtitle">
+          Human-only business partnering cannot scale to match enterprise decision velocity. Frontier teams use technology-first tools to compress the executive OODA loop.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <!-- STEP 1: One-Shot Animated Radial Gauges & Bounded OODA Loop -->
+        <div class="grid-2 build-item" data-step="1" style="gap:16px;">
+          <!-- Gauge 1: 15% Partnering Wall -->
+          <div class="card gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1e293b" stroke-width="8"/>
+              <circle id="g-ring-15" class="gauge-ring-anim" cx="40" cy="40" r="32" fill="none" stroke="#f43f5e" stroke-width="8"
+                      stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+              <text id="g-num-15" x="40" y="46" fill="#f8fafc" font-size="17" font-weight="800" text-anchor="middle">0%</text>
+            </svg>
+            <div>
+              <div class="slide-kicker" style="color:var(--accent-rose); margin-bottom:4px;">Partnering Wall</div>
+              <p style="font-size:0.96rem; color:var(--text-secondary); line-height:1.4;">
+                Only <strong>15% of FP&amp;A teams</strong> using "consulting-style" partnering scale support without staff burnout.
+              </p>
+            </div>
+          </div>
+
+          <!-- Gauge 2: 3x-4x Multiplier Bar -->
+          <div class="card gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <rect x="14" y="48" width="18" height="20" rx="3" fill="#64748b"/>
+              <rect id="g-bar-mult" class="mult-bar-anim" x="44" y="68" width="22" height="0" rx="3" fill="#10b981"/>
+              <text x="23" y="43" fill="#94a3b8" font-size="10" font-weight="bold" text-anchor="middle">1x</text>
+              <text x="55" y="11" fill="#10b981" font-size="12" font-weight="800" text-anchor="middle">3–4x</text>
+            </svg>
+            <div>
+              <div class="slide-kicker" style="color:var(--accent-emerald); margin-bottom:4px;">Tool-First Multiplier</div>
+              <p style="font-size:0.96rem; color:var(--text-secondary); line-height:1.4;">
+                <strong>Technology-first decision models</strong> are <strong>3x–4x more effective</strong> at enterprise scale and speed.
+              </p>
+            </div>
+          </div>
+
+          <!-- Gauge 3: 63% Low Impact -->
+          <div class="card gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1e293b" stroke-width="8"/>
+              <circle id="g-ring-63" class="gauge-ring-anim" cx="40" cy="40" r="32" fill="none" stroke="#f59e0b" stroke-width="8"
+                      stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+              <text id="g-num-63" x="40" y="46" fill="#f8fafc" font-size="17" font-weight="800" text-anchor="middle">0%</text>
+            </svg>
+            <div>
+              <div class="slide-kicker" style="color:var(--accent-amber); margin-bottom:4px;">Bolt-On AI Trap</div>
+              <p style="font-size:0.96rem; color:var(--text-secondary); line-height:1.4;">
+                <strong>63% of CFOs</strong> report low AI impact because tools are bolted onto legacy static reporting workflows.
+              </p>
+            </div>
+          </div>
+
+          <!-- Gauge 4: 60% Scenario Shift -->
+          <div class="card gauge-card">
+            <svg class="gauge-svg" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1e293b" stroke-width="8"/>
+              <circle id="g-ring-60" class="gauge-ring-anim" cx="40" cy="40" r="32" fill="none" stroke="#38bdf8" stroke-width="8"
+                      stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+              <text id="g-num-60" x="40" y="46" fill="#f8fafc" font-size="17" font-weight="800" text-anchor="middle">0%</text>
+            </svg>
+            <div>
+              <div class="slide-kicker" style="color:var(--accent-blue); margin-bottom:4px;">2028 Simulation Shift</div>
+              <p style="font-size:0.96rem; color:var(--text-secondary); line-height:1.4;">
+                <strong>60% of finance teams</strong> will use AI-enabled scenario planning as their primary partnering model by 2028.
+              </p>
+            </div>
+          </div>
+
+          <!-- Bounded OODA Loop Velocity Box -->
+          <div class="ooda-loop-Diagram-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.86rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent-blue);">
+                OODA Decision Loop Compression
+              </span>
+              <span style="font-size:0.84rem; color:var(--text-secondary);">Cycle Time Comparison</span>
+            </div>
+
+            <div class="ooda-track-outer">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span class="engine-tag" style="background:rgba(244,63,94,0.18); color:var(--accent-rose); border:1px solid var(--accent-rose);">Legacy Loop</span>
+                <span style="font-size:0.92rem; color:var(--text-secondary);">Static Deck → Email FP&amp;A → Wait in Queue → Custom Excel Tab</span>
+              </div>
+              <span style="font-size:0.94rem; font-weight:800; color:var(--accent-rose);">Multi-Week Lag</span>
+            </div>
+
+            <div class="ooda-track-inner">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span class="engine-tag emerald">HTML App Loop</span>
+                <div class="ooda-node-chain">
+                  <span class="ooda-node-pill">Observe</span>
+                  <span style="color:var(--accent-emerald); font-size:0.9rem;">→</span>
+                  <span class="ooda-node-pill">Orient</span>
+                  <span style="color:var(--accent-emerald); font-size:0.9rem;">→</span>
+                  <span class="ooda-node-pill">Decide</span>
+                  <span style="color:var(--accent-emerald); font-size:0.9rem;">→</span>
+                  <span class="ooda-node-pill">Act</span>
+                </div>
+              </div>
+              <span style="font-size:0.95rem; font-weight:800; color:var(--accent-emerald);">Near-Zero Turnaround</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEPS 2–5: Progressive Visual OODA Loop Matrix -->
+        <div class="card" style="justify-content:space-between;">
+          <div>
+            <div class="card-title" style="margin-bottom:12px;">
+              <span>Deconstructing the Executive OODA Loop</span>
+              <span class="badge-live">Steps 2–5: Click Next</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:112px 1fr 1fr; gap:12px; margin-bottom:10px; font-size:0.82rem; font-weight:800; text-transform:uppercase;">
+              <div>Stage</div>
+              <div style="background:rgba(244,63,94,0.14); color:var(--accent-rose); padding:7px; border-radius:6px; text-align:center;">Legacy Decks &amp; Excel Queue</div>
+              <div style="background:rgba(16,185,129,0.14); color:var(--accent-emerald); padding:7px; border-radius:6px; text-align:center;">Engineered HTML Decision Apps</div>
+            </div>
+
+            <!-- STEP 2: OBSERVE -->
+            <div class="ooda-row build-item" data-step="2">
+              <div class="ooda-stage-pill"><span>01 • INPUT</span><strong>Observe</strong></div>
+              <div class="ooda-cell legacy"><strong>40-Page KPI Hunting</strong>Sifting through static slides or 30+ tiles to spot variances.</div>
+              <div class="ooda-cell frontier"><strong>Synthesized Signal Hub</strong>Financials, OEM trends &amp; AI call highlights in one view.</div>
+            </div>
+
+            <!-- STEP 3: ORIENT -->
+            <div class="ooda-row build-item" data-step="3">
+              <div class="ooda-stage-pill"><span>02 • CONTEXT</span><strong>Orient</strong></div>
+              <div class="ooda-cell legacy"><strong>Analyst Ticket Queue</strong>Emailing FP&amp;A and waiting days for a custom Excel run.</div>
+              <div class="ooda-cell frontier"><strong>Live Self-Service Levers</strong>Leaders filter segments or drag commercial sliders live.</div>
+            </div>
+
+            <!-- STEP 4: DECIDE -->
+            <div class="ooda-row build-item" data-step="4">
+              <div class="ooda-stage-pill"><span>03 • BOUNDS</span><strong>Decide</strong></div>
+              <div class="ooda-cell legacy"><strong>Matrixed Version Chaos</strong>Debating disconnected copies without hurdle guardrails.</div>
+              <div class="ooda-cell frontier"><strong>Algorithmic Guardrails</strong>Locked WACC, comp splits &amp; margin floors validate live.</div>
+            </div>
+
+            <!-- STEP 5: ACT -->
+            <div class="ooda-row build-item" data-step="5" style="margin-bottom:0;">
+              <div class="ooda-stage-pill"><span>04 • SPEED</span><strong>Act</strong></div>
+              <div class="ooda-cell legacy"><strong>Multi-Week Latency</strong>Decisions stall until the next monthly reporting cycle.</div>
+              <div class="ooda-cell frontier"><strong>Near-Zero Turnaround</strong>Immediate execution; FP&amp;A coaches strategic trade-offs.</div>
+            </div>
+          </div>
+
+          <div class="guardrail-banner guardrail-pass build-item" data-step="5">
+            <span>Core Shift: Dashboards answer "What happened?" — Interactive Decision Apps answer "What should we do next?"</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Source Benchmarks: Gartner Finance 2030 &amp; AI in Finance Research</span>
+        <span>Slide 3 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 4: 4 ERAS OF FP&A + ONE-SHOT ANIMATED BARS (4 STEPS)        -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 11–15" data-steps="4">
+      <div class="slide-header">
+        <div class="slide-kicker">03 • The Evolutionary Arc</div>
+        <h1 class="slide-title">How FP&A Has Evolved—And Where Frontier Teams Are Moving</h1>
+        <p class="slide-subtitle">
+          Each evolution changes both the artifact delivered to executives and the ratio of FP&A time spent on manual compilation versus strategic coaching.
+        </p>
+      </div>
+
+      <div class="grid-4">
+        <!-- ERA 1.0 -->
+        <div class="era-col-card build-item" data-step="1" style="border-top-color:var(--text-muted);">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="era-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+              </div>
+              <span class="engine-tag" style="border:1px solid #64748b; color:#cbd5e1;">Era 1.0 • Past</span>
+            </div>
+            <h3 style="font-size:1.25rem; font-weight:800;">Static Ledgers &amp; Spreadsheets</h3>
+            <p class="body-copy">
+              Historical scorekeeping in fragile multi-tab workbooks understood only by the original author.
+            </p>
+            <div style="background:var(--bg-secondary); padding:14px; border-radius:12px; font-size:0.96rem; line-height:1.42;">
+              <strong style="color:var(--accent-blue); display:block; font-size:0.8rem; text-transform:uppercase; margin-bottom:4px;">FP&amp;A Persona</strong>
+              <strong>Data Aggregator:</strong> Manual reconciliation &amp; spreadsheet gatekeeping.
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.86rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:flex; justify-content:space-between;">
+              <span>Manual Prep: 85%</span><span>Strategy: 15%</span>
+            </div>
+            <div class="time-split-bar">
+              <div class="time-prep" id="era-bar-1a">85% PREP</div>
+              <div class="time-strat" id="era-bar-1b"></div>
+            </div>
+            <div style="margin-top:12px; text-align:center; font-size:0.96rem; font-weight:700; color:var(--text-secondary);">"What happened last month?"</div>
+          </div>
+        </div>
+
+        <!-- ERA 2.0 -->
+        <div class="era-col-card build-item" data-step="2" style="border-top-color:var(--accent-amber);">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="era-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              </div>
+              <span class="engine-tag" style="border:1px solid var(--accent-amber); color:var(--accent-amber);">Era 2.0 • Mainstream</span>
+            </div>
+            <h3 style="font-size:1.25rem; font-weight:800;">BI Dashboards &amp; 40-Page Decks</h3>
+            <p class="body-copy">
+              Sprawling KPI workspaces and dense quarterly slide packs that demand human interpretation.
+            </p>
+            <div style="background:var(--bg-secondary); padding:14px; border-radius:12px; font-size:0.96rem; line-height:1.42;">
+              <strong style="color:var(--accent-amber); display:block; font-size:0.8rem; text-transform:uppercase; margin-bottom:4px;">FP&amp;A Persona</strong>
+              <strong>Report Translator:</strong> Explaining KPIs in every meeting (15% scale).
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.86rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:flex; justify-content:space-between;">
+              <span>Deck Drag: 70%</span><span>Strategy: 30%</span>
+            </div>
+            <div class="time-split-bar">
+              <div class="time-prep" id="era-bar-2a">70% DRAG</div>
+              <div class="time-strat" id="era-bar-2b">30%</div>
+            </div>
+            <div style="margin-top:12px; text-align:center; font-size:0.96rem; font-weight:700; color:var(--accent-amber);">"What is happening across KPIs?"</div>
+          </div>
+        </div>
+
+        <!-- ERA 3.0 -->
+        <div class="era-col-card build-item" data-step="3" style="border-top-color:var(--accent-purple);">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="era-icon-box">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <span class="engine-tag purple">Era 3.0 • Bolt-On AI</span>
+            </div>
+            <h3 style="font-size:1.25rem; font-weight:800;">Task Automation &amp; Prompting</h3>
+            <p class="body-copy">
+              Using isolated prompts to draft variance commentary faster inside the same static reports.
+            </p>
+            <div style="background:var(--bg-secondary); padding:14px; border-radius:12px; font-size:0.96rem; line-height:1.42;">
+              <strong style="color:var(--accent-purple); display:block; font-size:0.8rem; text-transform:uppercase; margin-bottom:4px;">FP&amp;A Persona</strong>
+              <strong>Prompt Operator:</strong> Faster text, but 63% of CFOs see low impact.
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.86rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:flex; justify-content:space-between;">
+              <span>Manual Triage: 55%</span><span>Strategy: 45%</span>
+            </div>
+            <div class="time-split-bar">
+              <div class="time-prep" id="era-bar-3a">55%</div>
+              <div class="time-strat" id="era-bar-3b">45%</div>
+            </div>
+            <div style="margin-top:12px; text-align:center; font-size:0.96rem; font-weight:700; color:var(--accent-purple);">"Can we summarize this faster?"</div>
+          </div>
+        </div>
+
+        <!-- ERA 4.0 -->
+        <div class="era-col-card build-item" data-step="4" style="border-top-color:var(--accent-emerald);">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="era-icon-box" style="border-color:var(--accent-emerald);">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              </div>
+              <span class="engine-tag emerald">Era 4.0 • Frontier</span>
+            </div>
+            <h3 style="font-size:1.25rem; font-weight:800;">Engineered Decision Ecosystems</h3>
+            <p class="body-copy">
+              Deterministic calculation engines paired with AI agents to compile self-service HTML apps.
+            </p>
+            <div style="background:var(--bg-secondary); padding:14px; border-radius:12px; font-size:0.96rem; line-height:1.42;">
+              <strong style="color:var(--accent-emerald); display:block; font-size:0.8rem; text-transform:uppercase; margin-bottom:4px;">FP&amp;A Persona</strong>
+              <strong>Architect &amp; Coach:</strong> Coding guardrails &amp; elevating executive acumen.
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.86rem; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:flex; justify-content:space-between;">
+              <span>Ops: 15%</span><span style="color:var(--accent-emerald);">Architecture &amp; Coaching: 85%</span>
+            </div>
+            <div class="time-split-bar">
+              <div class="time-prep" id="era-bar-4a"></div>
+              <div class="time-strat" id="era-bar-4b">85% VALUE CREATION</div>
+            </div>
+            <div style="margin-top:12px; text-align:center; font-size:0.96rem; font-weight:800; color:var(--accent-emerald);">"What happens if we pull Lever X?"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Bottom Bars: % of FP&amp;A Bandwidth Spent on Manual Report Assembly (Red) vs. Decision Architecture &amp; Executive Coaching (Green)</span>
+        <span>Slide 4 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 5: LIVE DEMO HUB & DYNAMIC SVG CASH-FLOW CURVE (4 STEPS)    -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 15–24 (9 Mins Live Demos)" data-steps="4">
+      <div class="slide-header">
+        <div class="slide-kicker">04 • Upgrading the Artifact • Live Production Demos</div>
+        <h1 class="slide-title">Turning Financial Models & 40-Page Decks into Interactive Web Apps</h1>
+        <p class="slide-subtitle">
+          Press <strong>[1]</strong> or <strong>[2]</strong> on your keyboard at any time to launch the live GitHub applications, or press <strong>Next</strong> to watch the embedded hurdle-rate curve stress-test live.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Left Column: Visual App Cards -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <!-- STEP 1: Demo 1 -->
+          <div class="card build-item" data-step="1" style="border-left: 5px solid var(--accent-blue);">
+            <div class="card-title">
+              <span>Demo 1: Interactive CapEx Analyzer</span>
+              <span class="badge-live">Hotkey [1] • Model → App</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 125px 1fr; gap:16px; align-items:center;">
+              <svg viewBox="0 0 110 75" width="125" height="86" style="background:var(--bg-secondary); border-radius:10px; border:1px solid var(--border-color);">
+                <rect x="10" y="48" width="14" height="20" fill="#f43f5e" rx="2"/>
+                <rect x="30" y="38" width="14" height="30" fill="#38bdf8" rx="2"/>
+                <rect x="50" y="26" width="14" height="42" fill="#38bdf8" rx="2"/>
+                <rect x="70" y="14" width="14" height="54" fill="#10b981" rx="2"/>
+                <polyline points="17,55 37,40 57,28 77,16" fill="none" stroke="#f8fafc" stroke-width="2"/>
+              </svg>
+              <p class="body-copy">
+                Transforms a standard multi-tab DCF workbook into an interactive web app where non-finance executives test investment timing and operational drivers inside locked FP&amp;A hurdle guardrails.
+              </p>
+            </div>
+            <div>
+              <button class="btn-launch" onclick="openDemoModal('https://prakritnepal-git.github.io/capexanalyzer/')">⚡ Launch Live App [Press 1]</button>
+              <a class="btn-secondary" href="https://prakritnepal-git.github.io/capexanalyzer/" target="_blank" rel="noopener">↗ Open GitHub Tab</a>
+            </div>
+          </div>
+
+          <!-- STEP 2: Demo 2 -->
+          <div class="card build-item" data-step="2" style="border-left: 5px solid var(--accent-indigo);">
+            <div class="card-title">
+              <span>Demo 2: Q2'26 Competitive Analysis</span>
+              <span class="badge-live">Hotkey [2] • 40 Slides → Site</span>
+            </div>
+            <div style="display:grid; grid-template-columns: 125px 1fr; gap:16px; align-items:center;">
+              <svg viewBox="0 0 110 75" width="125" height="86" style="background:var(--bg-secondary); border-radius:10px; border:1px solid var(--border-color);">
+                <circle cx="38" cy="38" r="24" fill="none" stroke="#818cf8" stroke-width="2"/>
+                <polygon points="38,18 56,44 22,48" fill="rgba(56,189,248,0.35)" stroke="#38bdf8" stroke-width="1.5"/>
+                <rect x="70" y="16" width="30" height="8" rx="2" fill="#38bdf8"/>
+                <rect x="70" y="30" width="24" height="8" rx="2" fill="#10b981"/>
+                <rect x="70" y="44" width="28" height="8" rx="2" fill="#c084fc"/>
+              </svg>
+              <p class="body-copy">
+                Replaces a static 40-page quarterly presentation with an interactive executive radar—filtering peer financials, M&amp;A history, Hyperscaler/Cloud capabilities, and earnings call highlights.
+              </p>
+            </div>
+            <div>
+              <button class="btn-launch" onclick="openDemoModal('https://prakritnepal-git.github.io/Q226_competitive_analysis/')">⚡ Launch Live App [Press 2]</button>
+              <a class="btn-secondary" href="https://prakritnepal-git.github.io/Q226_competitive_analysis/" target="_blank" rel="noopener">↗ Open GitHub Tab</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Sandbox with Live Dynamic SVG Cash-Flow Chart -->
+        <div class="card build-item" data-step="3" id="s5-sandbox-card">
+          <div class="card-title">
+            <span>Live Guardrail Engine: 5-Year Cash Flow &amp; Hurdle Curve</span>
+            <span class="badge-live" id="s5-sim-mode-badge">Step 3: Base Case</span>
+          </div>
+
+          <div class="grid-2" style="gap:18px; align-items:center;">
+            <div>
+              <div class="sim-control">
+                <div class="sim-label"><span>CapEx Outlay</span><span id="capex-outlay-val" style="color:var(--accent-blue);">$1,200K</span></div>
+                <input type="range" id="capex-outlay" min="500" max="3000" step="100" value="1200" oninput="runGuardrailSim()" />
+              </div>
+              <div class="sim-control">
+                <div class="sim-label"><span>Annual Cash Inflow</span><span id="capex-inflow-val" style="color:var(--accent-emerald);">$480K/yr</span></div>
+                <input type="range" id="capex-inflow" min="150" max="1000" step="25" value="480" oninput="runGuardrailSim()" />
+              </div>
+              <div class="sim-control" style="margin-bottom:0;">
+                <div class="sim-label"><span>Ramp Delay</span><span id="capex-delay-val" style="color:var(--accent-amber);">3 Mos</span></div>
+                <input type="range" id="capex-delay" min="0" max="18" step="3" value="3" oninput="runGuardrailSim()" />
+              </div>
+            </div>
+
+            <!-- Dynamic SVG 5-Year Cash Flow Chart -->
+            <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; padding:14px;">
+              <div style="font-size:0.78rem; color:var(--text-secondary); font-weight:800; text-align:center; margin-bottom:6px;">
+                CUMULATIVE 5-YR NET CASH FLOW VS. BREAKEVEN
+              </div>
+              <svg viewBox="0 0 240 112" width="100%" height="122">
+                <line x1="15" y1="62" x2="228" y2="62" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 3"/>
+                <rect id="cf-bar-1" class="mult-bar-anim" x="28" y="62" width="22" height="28" rx="2" fill="#f43f5e"/>
+                <rect id="cf-bar-2" class="mult-bar-anim" x="66" y="48" width="22" height="14" rx="2" fill="#38bdf8"/>
+                <rect id="cf-bar-3" class="mult-bar-anim" x="104" y="34" width="22" height="28" rx="2" fill="#38bdf8"/>
+                <rect id="cf-bar-4" class="mult-bar-anim" x="142" y="22" width="22" height="40" rx="2" fill="#10b981"/>
+                <rect id="cf-bar-5" class="mult-bar-anim" x="180" y="12" width="22" height="50" rx="2" fill="#10b981"/>
+                <polyline id="cf-curve" points="39,88 77,52 115,38 153,24 191,14" fill="none" stroke="#f8fafc" stroke-width="2.5"/>
+                <text x="39" y="106" fill="#cbd5e1" font-size="10" font-weight="bold" text-anchor="middle">Y1</text>
+                <text x="77" y="106" fill="#cbd5e1" font-size="10" font-weight="bold" text-anchor="middle">Y2</text>
+                <text x="115" y="106" fill="#cbd5e1" font-size="10" font-weight="bold" text-anchor="middle">Y3</text>
+                <text x="153" y="106" fill="#cbd5e1" font-size="10" font-weight="bold" text-anchor="middle">Y4</text>
+                <text x="191" y="106" fill="#cbd5e1" font-size="10" font-weight="bold" text-anchor="middle">Y5</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="grid-3" style="gap:12px;">
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px; text-align:center;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">5-Yr Stress IRR</div>
+              <div id="sim-irr" style="font-size:1.65rem; font-weight:800; color:var(--accent-emerald);">21.4%</div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">Floor: ≥ 14.0%</div>
+            </div>
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px; text-align:center;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Net Present Value</div>
+              <div id="sim-npv" style="font-size:1.65rem; font-weight:800; color:var(--accent-blue);">+$248K</div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">WACC: 11.5%</div>
+            </div>
+            <div style="background:var(--bg-secondary); padding:12px; border-radius:10px; text-align:center;">
+              <div style="font-size:0.84rem; color:var(--text-secondary);">Risk-Adj Payback</div>
+              <div id="sim-payback" style="font-size:1.65rem; font-weight:800; color:var(--text-primary);">2.8 Yrs</div>
+              <div style="font-size:0.78rem; color:var(--text-muted);">Cap: ≤ 3.2 Yrs</div>
+            </div>
+          </div>
+
+          <div id="sim-guardrail-box" class="guardrail-banner guardrail-pass">
+            <span>✅ AUTO-APPROVED FOR STAGE-GATE: Meets all embedded FP&amp;A hurdle guardrails.</span>
+          </div>
+          <div class="build-item" data-step="4" style="height:0; overflow:hidden;"></div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Clicker Step 4 Auto-Animates a Guardrail Breach • Press [1] or [2] to Open Live GitHub Apps</span>
+        <span>Slide 5 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 6: INSIDE THE FACTORY VISUAL SCHEMATIC (5 CLICKER STEPS)    -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 24–31 (7 Mins Architecture Walkthrough)" data-steps="5">
+      <div class="factory-header-row">
+        <div>
+          <div class="slide-kicker">05 • Inside the Factory • Competitive Analysis Production Pipeline</div>
+          <h1 class="slide-title">How the Competitive Analysis Web App Is Built Every Quarter</h1>
+          <p class="slide-subtitle">
+            Chaining <strong>targeted generative AI agents</strong> with <strong>deterministic Excel calculation engines</strong> to turn external disclosures into an interactive web app.
+          </p>
+        </div>
+        <div class="roi-pill-group build-item" data-step="4">
+          <div class="roi-pill">⏱️ Saves 12–15 Hours / Quarter</div>
+          <div class="roi-pill secondary">🚀 40-Page Deck → Self-Service Web App</div>
+        </div>
+      </div>
+
+      <!-- 4-STAGE VISUAL PIPELINE -->
+      <div class="pipeline-flow">
+        <!-- STEP 1 -->
+        <div class="stage-card gen-ai build-item" data-step="1">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="stage-step-badge">Step 01</span>
+              <span class="engine-tag purple">Copilot Agent #1</span>
+            </div>
+            <div class="mini-flow-diagram">
+              <span style="color:var(--text-secondary);">Transcripts</span>
+              <span style="color:var(--accent-purple);">➔</span>
+              <span style="background:rgba(192,132,252,0.2); color:var(--accent-purple); padding:3px 8px; border-radius:4px;">Agent #1</span>
+              <span style="color:var(--accent-purple);">➔</span>
+              <span style="color:var(--text-primary);">Digest</span>
+            </div>
+            <div class="stage-title">Earnings Call Transcripts</div>
+            <p class="stage-body">
+              Gather competitor earnings call transcripts. Pre-instructed Copilot agent extracts strategic callouts in the exact structure required.
+            </p>
+          </div>
+          <div class="stage-output-box">
+            <span>Structured Generative Output</span>
+            Standardized Earnings Call Highlights
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="stage-card det-excel build-item" data-step="2">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="stage-step-badge">Step 02</span>
+              <span class="engine-tag emerald">Automated Excel</span>
+            </div>
+            <div class="mini-flow-diagram">
+              <span style="color:var(--accent-emerald);">10-Q / 10-K</span>
+              <span style="color:var(--accent-emerald);">➔</span>
+              <span style="background:rgba(16,185,129,0.18); color:var(--accent-emerald); padding:3px 8px; border-radius:4px;">Excel Engine</span>
+              <span style="color:var(--accent-emerald);">➔</span>
+              <span style="color:var(--text-primary);">Peer KPIs</span>
+            </div>
+            <div class="stage-title">Standardized Financials</div>
+            <p class="stage-body">
+              Bring competitor financial disclosures into a standardized, largely automated Excel template—keeping all margin and growth math 100% deterministic.
+            </p>
+          </div>
+          <div class="stage-output-box">
+            <span>Deterministic Calculation Engine</span>
+            Normalized Peer P&amp;L &amp; Financial Tables
+          </div>
+        </div>
+
+        <!-- STEP 3 (TWO DISTINCT VISUAL MODULES: 3A + 3B) -->
+        <div class="stage-card det-excel build-item" data-step="3">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="stage-step-badge">Step 03</span>
+              <span class="engine-tag emerald">2 Excel Templates</span>
+            </div>
+            <div class="stage-title">M&amp;A + Tech Capabilities</div>
+            <div>
+              <div class="sub-module">
+                <strong>3A. M&amp;A Detail History</strong>
+                Standardized template tracking competitor acquisition history and deal terms.
+              </div>
+              <div class="sub-module" style="border-left-color:var(--accent-blue); margin-bottom:0;">
+                <strong>3B. Hyperscaler, Cloud &amp; AI</strong>
+                Separate structured template mapping Hyperscaler partnerships, Cloud &amp; AI capabilities.
+              </div>
+            </div>
+          </div>
+          <div class="stage-output-box">
+            <span>Dual Structured Outputs</span>
+            M&amp;A History + Hyperscaler / Cloud Matrix
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="stage-card compiler-ai build-item" data-step="4">
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="stage-step-badge">Step 04</span>
+              <span class="engine-tag blue">Copilot Agent #2</span>
+            </div>
+            <div class="mini-flow-diagram" style="border-color:rgba(56,189,248,0.4);">
+              <span style="color:var(--accent-blue);">Steps 1–3</span>
+              <span style="color:var(--accent-blue);">➔</span>
+              <span style="background:rgba(56,189,248,0.2); color:var(--accent-blue); padding:3px 8px; border-radius:4px;">Agent #2</span>
+              <span style="color:var(--accent-blue);">➔</span>
+              <span style="color:var(--accent-emerald);">HTML App</span>
+            </div>
+            <div class="stage-title">Auto-Build &amp; Save Web App</div>
+            <p class="stage-body">
+              Trigger a second Copilot agent that automatically builds the interactive web app and saves it in a predefined location, ready for distribution.
+            </p>
+          </div>
+          <div class="stage-output-box" style="border-color:var(--accent-blue);">
+            <span>Final Deliverable</span>
+            Interactive HTML App Ready for Executives
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: BOTTOM RIBBON OF 4 OTHER EXAMPLES -->
+      <div class="portfolio-ribbon build-item" data-step="5">
+        <div class="portfolio-ribbon-header">
+          <div style="font-size:0.9rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent-blue);">
+            Replicating the Pattern: Other Production Apps Built on the Same Architecture
+          </div>
+          <div style="font-size:0.88rem; color:var(--text-secondary);">
+            Core Blueprint: <strong>AI-Built Deterministic Calculation Engines + Targeted Generative Elements</strong>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="portfolio-mini-card">
+            <h4>1. Market Share Analysis</h4>
+            <p>Combines external industry data and OEM filings with internal segment performance to track wallet-share capture dynamically—including trend, OEM performance, and qualitative AI-generated takeaways.</p>
+          </div>
+          <div class="portfolio-mini-card" style="border-left-color:var(--accent-emerald);">
+            <h4>2. Comp Split &amp; Unit Economics</h4>
+            <p>Interactive financial model testing compensation splits, resourcing estimates, and unit economics across <strong>Technical, Sales, and Pre-Sales</strong> teams.</p>
+          </div>
+          <div class="portfolio-mini-card" style="border-left-color:var(--accent-amber);">
+            <h4>3. Share Price &amp; Valuation Model</h4>
+            <p>Simulates how financial measures flow through to share price and valuation multiples.</p>
+          </div>
+          <div class="portfolio-mini-card" style="border-left-color:var(--accent-purple);">
+            <h4>4. M&amp;A Analysis (Qual + Quant)</h4>
+            <p>Unifies financial modeling with qualitative strategic capability scoring into a single interactive deal-review app—extremely helpful for aggregating critical information during due diligence.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Pipeline Rule: Use AI to build deterministic calculation engines and synthesize qualitative insights—then compile into self-service apps</span>
+        <span>Slide 6 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 7: BOUNDED LAYER STACK + ARCHITECTURE ROWS (4 STEPS)        -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 31–35" data-steps="4">
+      <div class="slide-header">
+        <div class="slide-kicker">06 • Enterprise System Architecture</div>
+        <h1 class="slide-title">Engineering the Connected Decision Ecosystem</h1>
+        <p class="slide-subtitle">
+          Press Next to build the architecture from the unified data foundation (Layer 1) up to role-tailored executive consumption (Layer 4).
+        </p>
+      </div>
+
+      <div class="arch-layout">
+        <!-- Left Column: Bounded Visual 4-Layer Stack Diagram -->
+        <div class="card" style="justify-content:space-between; padding:20px;">
+          <div style="font-size:0.86rem; font-weight:800; color:var(--accent-blue); text-transform:uppercase; text-align:center;">
+            Bottom-Up Ecosystem Stack
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div id="iso-plate-4" class="stack-plate-visual" style="border-color:var(--accent-emerald); background:rgba(16,185,129,0.12);">
+              <div style="font-size:0.76rem; font-weight:800; color:var(--accent-emerald);">LAYER 04 • TOP</div>
+              <div style="font-size:1.05rem; font-weight:800;">Executive Decision UX</div>
+            </div>
+            <div style="text-align:center; color:var(--accent-blue); font-size:0.9rem; line-height:1;">▲</div>
+            <div id="iso-plate-3" class="stack-plate-visual" style="border-color:var(--accent-blue); background:rgba(56,189,248,0.12);">
+              <div style="font-size:0.76rem; font-weight:800; color:var(--accent-blue);">LAYER 03 • COMPILER</div>
+              <div style="font-size:1.05rem; font-weight:800;">Multi-Agent Builders</div>
+            </div>
+            <div style="text-align:center; color:var(--accent-blue); font-size:0.9rem; line-height:1;">▲</div>
+            <div id="iso-plate-2" class="stack-plate-visual" style="border-color:var(--accent-indigo); background:rgba(129,140,248,0.12);">
+              <div style="font-size:0.76rem; font-weight:800; color:var(--accent-indigo);">LAYER 02 • ENGINE</div>
+              <div style="font-size:1.05rem; font-weight:800;">Deterministic Guardrails</div>
+            </div>
+            <div style="text-align:center; color:var(--accent-blue); font-size:0.9rem; line-height:1;">▲</div>
+            <div id="iso-plate-1" class="stack-plate-visual" style="border-color:var(--accent-amber); background:rgba(245,158,11,0.12);">
+              <div style="font-size:0.76rem; font-weight:800; color:var(--accent-amber);">LAYER 01 • FOUNDATION</div>
+              <div style="font-size:1.05rem; font-weight:800;">Internal + OEM/M&amp;A Feeds</div>
+            </div>
+          </div>
+
+          <div style="font-size:0.84rem; color:var(--text-secondary); text-align:center; font-weight:600;">
+            Governed Truth Flows Upward
+          </div>
+        </div>
+
+        <!-- Right Column: 4 Progressive Architectural Layers -->
+        <div style="display:flex; flex-direction:column; gap:14px; justify-content:space-between;">
+          <!-- LAYER 4 -->
+          <div class="arch-stack-row build-item" data-step="4" style="border-left-color:var(--accent-emerald);">
+            <div>
+              <div style="font-size:0.8rem; color:var(--accent-emerald); font-weight:800;">LAYER 4 • CONSUMPTION</div>
+              <div style="font-size:1.18rem; font-weight:800;">Role-Tailored Decision Apps</div>
+            </div>
+            <div style="font-size:0.98rem; color:var(--text-secondary); line-height:1.42;">
+              Surfaces bespoke HTML simulators, deal-review apps, and conversational interfaces tailored to the commercial levers each leader controls.
+            </div>
+            <div class="arch-stack-proof">
+              <strong>First Abu Dhabi Bank ("AI CFO"):</strong> Replaced report-hunting with conversational decision support (&lt;1.0% finance cost target).
+            </div>
+          </div>
+
+          <!-- LAYER 3 -->
+          <div class="arch-stack-row build-item" data-step="3" style="border-left-color:var(--accent-blue);">
+            <div>
+              <div style="font-size:0.8rem; color:var(--accent-blue); font-weight:800;">LAYER 3 • COMPILATION</div>
+              <div style="font-size:1.18rem; font-weight:800;">Multi-Agent Builders</div>
+            </div>
+            <div style="font-size:0.98rem; color:var(--text-secondary); line-height:1.42;">
+              Copilot Agent #1 extracts structured signals from unstructured transcripts; Agent #2 compiles standardized templates into production HTML apps.
+            </div>
+            <div class="arch-stack-proof">
+              <strong>TRAFFIX Order-to-Cash OS:</strong> Connected AI pricing and carrier agents within margin guardrails for <strong>+$1.5M revenue</strong>.
+            </div>
+          </div>
+
+          <!-- LAYER 2 -->
+          <div class="arch-stack-row build-item" data-step="2" style="border-left-color:var(--accent-indigo);">
+            <div>
+              <div style="font-size:0.8rem; color:var(--accent-indigo); font-weight:800;">LAYER 2 • DETERMINISTIC LOGIC</div>
+              <div style="font-size:1.18rem; font-weight:800;">Calculation Engines &amp; Rules</div>
+            </div>
+            <div style="font-size:0.98rem; color:var(--text-secondary); line-height:1.42;">
+              Locks in enterprise truth via automated Excel templates, Power BI semantic models, DAX, services cost catalogs, and comp unit-economic rules.
+            </div>
+            <div class="arch-stack-proof">
+              <strong>Governance Rule:</strong> Never ask an LLM to improvise financial math—keep calculations 100% deterministic.
+            </div>
+          </div>
+
+          <!-- LAYER 1 -->
+          <div class="arch-stack-row build-item" data-step="1" style="border-left-color:var(--accent-amber);">
+            <div>
+              <div style="font-size:0.8rem; color:var(--accent-amber); font-weight:800;">LAYER 1 • DATA FOUNDATION</div>
+              <div style="font-size:1.18rem; font-weight:800;">Internal + External Signals</div>
+            </div>
+            <div style="font-size:0.98rem; color:var(--text-secondary); line-height:1.42;">
+              Combines internal ERP/CRM data (Databricks, Dataverse, Fabric) with external market feeds (OEM filings, 10-Q/10-K, transcripts, M&amp;A logs).
+            </div>
+            <div class="arch-stack-proof">
+              <strong>Pipeline Readiness:</strong> Translating internal operations and external OEM/competitor signals into structured drivers.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Architecture Principle: Centralize the Deterministic Truth (Layers 1–2), Tailor the Interactive Experience (Layers 3–4)</span>
+        <span>Slide 7 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 8: THE NEW OPERATING MODEL & BANDWIDTH SHIFT (3 STEPS)      -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 35–39" data-steps="3">
+      <div class="slide-header">
+        <div class="slide-kicker">07 • Organizational Transformation</div>
+        <h1 class="slide-title">The New FP&A Mandate: Product Architects & Financial Coaches</h1>
+      </div>
+
+      <!-- One-Shot Animated Bandwidth Shift Bar -->
+      <div class="card" style="padding:18px 24px;">
+        <div class="grid-2" style="gap:28px; align-items:center;">
+          <div>
+            <div style="font-size:0.86rem; font-weight:800; color:var(--accent-rose); text-transform:uppercase; margin-bottom:8px;">
+              Legacy "Consulting-Style" FP&amp;A Bandwidth (Bottlenecked)
+            </div>
+            <div class="time-split-bar" style="height:28px;">
+              <div id="s8-bar-leg1" class="time-prep" style="background:var(--accent-rose);">55% Data &amp; Deck Assembly</div>
+              <div id="s8-bar-leg2" class="time-prep" style="background:var(--accent-amber);">30% Ad-Hoc Re-Runs</div>
+              <div id="s8-bar-leg3" class="time-strat" style="background:var(--accent-emerald);">15%</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.86rem; font-weight:800; color:var(--accent-emerald); text-transform:uppercase; margin-bottom:8px;">
+              Frontier "Product &amp; Coaching" FP&amp;A Bandwidth (Scalable)
+            </div>
+            <div class="time-split-bar" style="height:28px;">
+              <div id="s8-bar-fr1" class="time-prep" style="background:#475569;">15% Ops</div>
+              <div id="s8-bar-fr2" class="time-strat" style="background:var(--accent-blue);">45% Architecting Apps &amp; Guardrails</div>
+              <div id="s8-bar-fr3" class="time-strat" style="background:var(--accent-emerald);">40% Executive Coaching</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <!-- STEP 1 -->
+        <div class="card build-item" data-step="1" style="border-top: 5px solid var(--accent-blue); justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="card-title"><span>1. Act Like a Product Team</span><span class="engine-tag blue">Product Pod</span></div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; font-size:0.86rem; font-weight:700;">
+              <div style="background:var(--bg-secondary); border:1px solid var(--accent-blue); padding:10px 6px; border-radius:8px; color:var(--accent-blue);">Product Owner</div>
+              <div style="background:var(--bg-secondary); border:1px solid var(--accent-indigo); padding:10px 6px; border-radius:8px; color:var(--accent-indigo);">Biz Architect</div>
+              <div style="background:var(--bg-secondary); border:1px solid var(--accent-emerald); padding:10px 6px; border-radius:8px; color:var(--accent-emerald);">FP&amp;A Builder</div>
+            </div>
+            <ul class="bullet-list">
+              <li><strong>Manage Models as Products:</strong> Dedicated <em>Modeling Product Teams</em> own reusable decision engines rather than one-off spreadsheets.</li>
+              <li><strong>Track Behavioral UX Metrics:</strong> Measure executive adoption and decision velocity (e.g., Mars tracks user behavior on finance tools).</li>
+            </ul>
+          </div>
+          <div class="stage-output-box"><span>Outcome</span>Reusable Decision Products vs. Ad-Hoc Workbooks</div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="card build-item" data-step="2" style="border-top: 5px solid var(--accent-emerald); justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="card-title"><span>2. Code Strategic Guardrails</span><span class="engine-tag emerald">Boundaries</span></div>
+            <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:10px; padding:12px; text-align:center;">
+              <div style="font-size:0.76rem; font-weight:800; color:var(--accent-rose); border-bottom:1px dashed var(--accent-rose); padding-bottom:4px;">PAYBACK &amp; RISK CEILING</div>
+              <div style="font-size:0.96rem; font-weight:800; color:var(--accent-emerald); padding:6px 0;">Self-Service Safe Zone</div>
+              <div style="font-size:0.76rem; font-weight:800; color:var(--accent-rose); border-top:1px dashed var(--accent-rose); padding-top:4px;">WACC &amp; MARGIN FLOOR</div>
+            </div>
+            <ul class="bullet-list">
+              <li><strong>Define How the Business Thinks:</strong> Hardcode comp splits, resourcing estimates, and margin floors directly into self-service apps.</li>
+              <li><strong>Exception-Based Partnering:</strong> Leaders self-serve routine scenarios; FP&amp;A steps in when a proposal breaches guardrail bounds.</li>
+            </ul>
+          </div>
+          <div class="stage-output-box"><span>Outcome</span>Self-Sufficiency Without Losing Financial Control</div>
+        </div>
+
+        <!-- STEP 3 (UPDATED: NO 97% / $500K STATS ON SLIDE; CLEAN COACHING VISUAL) -->
+        <div class="card build-item" data-step="3" style="border-top: 5px solid var(--accent-indigo); justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="card-title"><span>3. Coach Financial Acumen</span><span class="engine-tag purple">Enablement</span></div>
+            <div style="display:grid; grid-template-columns:1fr 24px 1fr; gap:8px; align-items:center; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:10px; padding:12px; text-align:center;">
+              <div style="background:rgba(56,189,248,0.12); border:1px solid var(--accent-blue); border-radius:8px; padding:8px 6px;">
+                <div style="font-size:0.9rem; font-weight:800; color:var(--accent-blue);">Tool Fluency</div>
+                <div style="font-size:0.74rem; color:var(--text-secondary);">Navigating Levers</div>
+              </div>
+              <div style="font-size:1rem; font-weight:800; color:var(--accent-emerald);">+</div>
+              <div style="background:rgba(192,132,252,0.12); border:1px solid var(--accent-purple); border-radius:8px; padding:8px 6px;">
+                <div style="font-size:0.9rem; font-weight:800; color:var(--accent-purple);">Finance Mindset</div>
+                <div style="font-size:0.74rem; color:var(--text-secondary);">Driver Trade-Offs</div>
+              </div>
+            </div>
+            <ul class="bullet-list">
+              <li><strong>Coach on Trade-Offs, Not Tabs:</strong> Senior business partners train executives to interpret commercial drivers and unit economics independently.</li>
+              <li><strong>Upskill Citizen Builders:</strong> Pair structured digital &amp; AI literacy with rapid, stage-gate tool builds across the finance organization.</li>
+            </ul>
+          </div>
+          <div class="stage-output-box"><span>Outcome</span>Elevated Executive Commercial Acumen</div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Source Cases: Gartner Organizational Models at the Frontier &amp; Award-Winning CFO Lessons</span>
+        <span>Slide 8 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 9: VISUAL RISK & GOVERNANCE MATRIX (4 CLICKER STEPS)        -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 39–42" data-steps="4">
+      <div class="slide-header">
+        <div class="slide-kicker">08 • Objective Risk &amp; Trade-Off Analysis</div>
+        <h1 class="slide-title">Where Decision Ecosystems Fail—And How to Govern Them</h1>
+        <p class="slide-subtitle">
+          Deploying interactive HTML apps and multi-agent workflows introduces four failure modes that require explicit architectural controls.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <!-- STEP 1 -->
+        <div class="card build-item" data-step="1" style="border-left: 5px solid var(--accent-rose);">
+          <div class="card-title">
+            <span>1. Public vs. Confidential Payloads</span>
+            <span class="engine-tag" style="background:rgba(244,63,94,0.15); color:var(--accent-rose); border:1px solid var(--accent-rose);">Data Perimeter</span>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 32px 1fr; gap:12px; align-items:center; background:var(--bg-secondary); padding:14px 16px; border-radius:10px; font-size:0.92rem; line-height:1.4;">
+            <div><strong style="color:var(--accent-emerald); display:block;">External Data (Comp / OEM)</strong>Safe as portable standalone HTML</div>
+            <div style="text-align:center; color:var(--accent-blue); font-weight:800;">vs</div>
+            <div><strong style="color:var(--accent-rose); display:block;">Internal (Comp Split / M&amp;A)</strong>Wrap in SSO / SharePoint</div>
+          </div>
+          <p class="body-copy">
+            Client-side HTML embeds data arrays in code. Keep public competitive intelligence portable, but deploy sensitive Sales/Pre-Sales/Tech comp or live M&amp;A due diligence inside authenticated containers.
+          </p>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="card build-item" data-step="2" style="border-left: 5px solid var(--accent-amber);">
+          <div class="card-title">
+            <span>2. Executive "Slider Gaming"</span>
+            <span class="engine-tag" style="background:rgba(245,158,11,0.15); color:var(--accent-amber); border:1px solid var(--accent-amber);">Guardrail Locks</span>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 32px 1fr; gap:12px; align-items:center; background:var(--bg-secondary); padding:14px 16px; border-radius:10px; font-size:0.92rem; line-height:1.4;">
+            <div><strong style="color:var(--accent-rose); display:block;">Threat: Reverse-Engineering</strong>Dragging sliders until IRR turns green</div>
+            <div style="text-align:center; color:var(--accent-emerald); font-weight:800;">➔</div>
+            <div><strong style="color:var(--accent-emerald); display:block;">Fix: Hardcoded Bounds</strong>Locked WACC &amp; auto-stress case</div>
+          </div>
+          <p class="body-copy">
+            Prevent reverse-engineered approvals by locking corporate hurdle rates, overhead allocations, and displaying a mandatory <em>FP&amp;A Downside Stress Case</em> beside the executive's scenario.
+          </p>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="card build-item" data-step="3" style="border-left: 5px solid var(--accent-indigo);">
+          <div class="card-title">
+            <span>3. Multi-Agent Schema Drift</span>
+            <span class="engine-tag blue">Schema Contracts</span>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 32px 1fr; gap:12px; align-items:center; background:var(--bg-secondary); padding:14px 16px; border-radius:10px; font-size:0.92rem; line-height:1.4;">
+            <div><strong style="color:var(--accent-rose); display:block;">Threat: Format Shifts</strong>Agent #1 alters output structure</div>
+            <div style="text-align:center; color:var(--accent-emerald); font-weight:800;">➔</div>
+            <div><strong style="color:var(--accent-emerald); display:block;">Fix: Locked Contracts</strong>Strict JSON &amp; Named Excel Tables</div>
+          </div>
+          <p class="body-copy">
+            If an extraction agent alters its format or an Excel column shifts, the app compiler can misbind a metric. Enforce locked intermediate templates between Step 1, Steps 2–3, and Step 4.
+          </p>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="card build-item" data-step="4" style="border-left: 5px solid var(--accent-emerald);">
+          <div class="card-title">
+            <span>4. Junior Analyst Learning Curve</span>
+            <span class="engine-tag emerald">Talent Redesign</span>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 32px 1fr; gap:12px; align-items:center; background:var(--bg-secondary); padding:14px 16px; border-radius:10px; font-size:0.92rem; line-height:1.4;">
+            <div><strong style="color:var(--accent-rose); display:block;">Old Training</strong>Manual transcript &amp; deck assembly</div>
+            <div style="text-align:center; color:var(--accent-emerald); font-weight:800;">➔</div>
+            <div><strong style="color:var(--accent-emerald); display:block;">New Training</strong>Driver-tree auditing &amp; red-teaming</div>
+          </div>
+          <p class="body-copy">
+            When automation removes 12–15 hours of manual quarterly prep, intentionally train early-career analysts on business architecture, agent instruction design, and stress-testing model logic.
+          </p>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Governance Principle: Use Specialized Agents for Text &amp; UI Compilation—Keep Financial Math Deterministic in Governed Templates</span>
+        <span>Slide 9 of 10</span>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- SLIDE 10: 30-DAY VISUAL ROADMAP & OPEN Q&A (3 CLICKER STEPS)      -->
+    <!-- ================================================================= -->
+    <section class="slide" data-pace="Target: Min 42–45 + Q&A" data-steps="3">
+      <div class="slide-header">
+        <div class="slide-kicker">09 • Execution Playbook &amp; Open Q&amp;A</div>
+        <h1 class="slide-title">The 30-Day Challenge: Kill One Deck, Upgrade One Model</h1>
+        <p class="slide-subtitle">
+          You do not need a multi-year ERP overhaul to shift from passive reporting to active decision ecosystems. Build your first multi-agent HTML workflow next month.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <!-- STEP 1 -->
+        <div class="card build-item" data-step="1" style="border-top: 5px solid var(--accent-blue); justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="slide-kicker">Days 01–10 • Standardize</span>
+              <span class="engine-tag blue">Phase 1</span>
+            </div>
+            <h3 style="font-size:1.3rem; font-weight:800;">1. Lock Deterministic Templates</h3>
+            <p class="body-copy">
+              Pick one external-heavy deck (Competitive or Market Share Analysis) or one high-friction model (CapEx or Comp Unit Economics). Standardize the Excel calculation engine and write strict extraction instructions for <strong>Copilot Agent #1</strong>.
+            </p>
+          </div>
+          <div class="stage-output-box"><span>Deliverable</span>Locked Excel Engine + Extraction Agent</div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="card build-item" data-step="2" style="border-top: 5px solid var(--accent-indigo); justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="slide-kicker">Days 11–20 • Compile</span>
+              <span class="engine-tag purple">Phase 2</span>
+            </div>
+            <h3 style="font-size:1.3rem; font-weight:800;">2. Configure Copilot Agent #2</h3>
+            <p class="body-copy">
+              Equip a second Copilot agent with your HTML layout rules, interactive filters, and hardcoded financial guardrails so it automatically compiles your structured inputs and saves the web app to a shared location.
+            </p>
+          </div>
+          <div class="stage-output-box"><span>Deliverable</span>Automated HTML App Compiler</div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="card build-item" data-step="3" style="border-top: 5px solid var(--accent-emerald); justify-content:space-between;">
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="slide-kicker">Days 21–30 • Coach</span>
+              <span class="engine-tag emerald">Phase 3</span>
+            </div>
+            <h3 style="font-size:1.3rem; font-weight:800;">3. Shift the Executive Review</h3>
+            <p class="body-copy">
+              Reclaim <strong>12–15 hours per quarter</strong> of manual slide formatting. Distribute the interactive app ahead of the meeting and spend the session coaching leaders through live commercial trade-offs.
+            </p>
+          </div>
+          <div class="stage-output-box"><span>Deliverable</span>Live Executive Scenario Coaching</div>
+        </div>
+      </div>
+
+      <!-- Bottom Live Reference Hub -->
+      <div class="card build-item" data-step="3" style="display:flex; flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; border-color:var(--accent-blue); padding:20px 26px;">
+        <div>
+          <div class="slide-kicker" style="margin-bottom:4px;">Live Reference Architectures • Open Floor for Q&amp;A</div>
+          <h3 style="font-size:1.35rem; font-weight:800;">Inspect the Live Interactive FP&amp;A Applications</h3>
+        </div>
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <button class="btn-launch" style="margin:0;" onclick="openDemoModal('https://prakritnepal-git.github.io/capexanalyzer/')">⚡ [1] Launch CapEx Analyzer</button>
+          <button class="btn-launch" style="margin:0;" onclick="openDemoModal('https://prakritnepal-git.github.io/Q226_competitive_analysis/')">⚡ [2] Launch Q2'26 Competitive Analysis</button>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <span>Thank You • Prakrit Nepal, Director of FP&amp;A • FP&amp;A Summit Boston</span>
+        <span>Slide 10 of 10</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Speaker Notes Drawer -->
+  <aside class="notes-drawer" id="notes-drawer">
+    <div class="notes-header">
+      <span id="notes-slide-title">Speaker Notes &amp; Talking Points — Slide 1</span>
+      <button class="hud-btn" onclick="toggleNotes()">Close Notes [N]</button>
+    </div>
+    <div class="notes-body" id="notes-content"></div>
+  </aside>
+
+  <!-- Embedded Live Demo Modal -->
+  <div class="modal-overlay" id="demo-modal">
+    <div class="modal-bar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="badge-live"><span class="pulse-dot"></span>Live Embedded App</span>
+        <button class="hud-btn" onclick="switchModalUrl('https://prakritnepal-git.github.io/capexanalyzer/')">[1] CapEx Analyzer</button>
+        <button class="hud-btn" onclick="switchModalUrl('https://prakritnepal-git.github.io/Q226_competitive_analysis/')">[2] Q2'26 Competitive Analysis</button>
+        <span id="modal-url-label" style="font-family:monospace; font-size:0.84rem; color:var(--text-secondary);"></span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <a id="modal-ext-link" href="https://prakritnepal-git.github.io/capexanalyzer/" target="_blank" rel="noopener" class="hud-btn" style="text-decoration:none;">↗ Open in Browser Tab</a>
+        <button class="hud-btn" style="background:var(--accent-rose); border-color:var(--accent-rose); color:#fff;" onclick="closeDemoModal()">✕ Close [Esc]</button>
+      </div>
+    </div>
+    <iframe class="modal-iframe" id="demo-iframe" src="about:blank" title="Live Interactive FP&A App"></iframe>
+  </div>
+
+  <!-- Blackout Screen Overlay -->
+  <div class="blackout-overlay" id="blackout-overlay" onclick="toggleBlackout()">
+    <span>Screen Blackout Active — Press Any Key or Clicker Button to Resume</span>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+    let currentStep = 1;
+
+    const slideMaxSteps = Array.from(slides).map(s => parseInt(s.getAttribute('data-steps') || '1', 10));
+    const totalDeckSteps = slideMaxSteps.reduce((a, b) => a + b, 0);
+
+    // One-time animation state flags
+    let s2Step1Animated = false;
+    let s2Step2Animated = false;
+    let s3GaugesAnimated = false;
+    const s4ErasAnimated = [false, false, false, false];
+    let s8BarsAnimated = false;
+
+    const speakerNotes = [
+      // Slide 1
+      `<strong>[Slide 1 • Cover & Dual-Track Overview (2 Clicker Steps)]</strong><br/>
+      • <strong>Step 1 (Track I — Strategic Thought Leadership):</strong> Welcome the FP&A Summit Boston audience. Frame the session around two intersecting pillars: first, <strong>Thought Leadership</strong>—why static dashboards create an executive attention deficit, where FP&A is evolving by 2030, and how our role shifts from report translators to ecosystem architects and coaches.<br/>
+      • <strong>Press Next (Step 2 — Track II — Tactical Execution):</strong> Second, <strong>Tactical Execution</strong>—you are looking at a standalone HTML app right now instead of PowerPoint. We will demo two live production web apps, walk inside the 4-step multi-agent + Excel factory that saves 12–15 hours a quarter, and give you a 30-day playbook.`,
+      // Slide 2
+      `<strong>[Slide 2 • The Meta-Hook: 40-Slide Sorter vs. Interactive App (2 Clicker Steps)]</strong><br/>
+      • <strong>Step 1 (Left Sorter Mockup):</strong> Point to the 40-slide deck sorter. Executives skim Slide 1, wade through P&L tables on Slide 4, and <strong>lose the narrative thread by Slide 12</strong>—hitting 92% cognitive overload.<br/>
+      • <strong>Press Next (Step 2 — Right App Mockup):</strong> Watch the commercial sliders and cash-flow bars animate into place. Locked WACC/margin guardrails and real-time decisioning.`,
+      // Slide 3
+      `<strong>[Slide 3 • Empirical Diagnosis & OODA Loop (5 Clicker Steps)]</strong><br/>
+      • <strong>Step 1 (One-Shot Animated Gauges):</strong> Watch the gauges sweep from 0% to their benchmarks: <strong>15%</strong> consulting-style partnering wall, <strong>3x–4x</strong> tool-first multiplier, <strong>63%</strong> low AI impact from bolt-ons, and <strong>60%</strong> shift to AI simulations by 2028.<br/>
+      • <strong>Steps 2–5 (Right OODA Matrix):</strong> Click Next 4 times to walk down <strong>Observe → Orient → Decide → Act</strong>.`,
+      // Slide 4
+      `<strong>[Slide 4 • 4 Eras of FP&A (4 Clicker Steps)]</strong><br/>
+      • As you click through Eras 1.0 to 4.0, each Era's bottom bandwidth bar animates once from 0%—showing the flip from <strong>85% manual prep / 15% strategy</strong> in Era 1.0 to <strong>85% architecture & coaching</strong> in Era 4.0.`,
+      // Slide 5
+      `<strong>[Slide 5 • Live Demos & Cash-Flow Curve (4 Clicker Steps)]</strong><br/>
+      • <strong>Step 1:</strong> Press <strong>[1]</strong> on keyboard to launch CapEx Analyzer live modal.<br/>
+      • <strong>Step 2:</strong> Press <strong>[2]</strong> on keyboard to launch Q2'26 Competitive Analysis live modal.<br/>
+      • <strong>Step 3:</strong> Point to the live 5-Year Cash Flow SVG chart in the Base Case (21.4% IRR, Auto-Approved).<br/>
+      • <strong>Step 4 (Hands-Free Stress Breach!):</strong> Press Next on your clicker—watch the SVG cash-flow bars and curve animate downward into a <strong>Red Guardrail Breach (8.0% IRR)</strong> automatically.`,
+      // Slide 6
+      `<strong>[Slide 6 • Inside the Factory (5 Clicker Steps)]</strong><br/>
+      • <strong>Step 1:</strong> Gather competitor earnings call transcripts; <strong>Copilot Agent #1</strong> (prebuilt instructions) outputs structured call highlights.<br/>
+      • <strong>Step 2:</strong> Bring financials into a standardized, largely automated Excel calculation engine.<br/>
+      • <strong>Step 3:</strong> Two distinct Excel templates: <strong>(3A) M&A detail history</strong> and <strong>(3B) Hyperscaler, Cloud & AI capabilities</strong>.<br/>
+      • <strong>Step 4:</strong> Trigger <strong>Copilot Agent #2</strong> to automatically build and save the web app—<strong>saving 12–15 hours per quarter</strong>.<br/>
+      • <strong>Step 5:</strong> Reveal the 4 replicated apps at the bottom: Market Share (with OEM filings & AI takeaways), Comp Split & Unit Economics (Tech, Sales, Pre-Sales), Share Price Model, and M&A Qual+Quant Due Diligence.`,
+      // Slide 7
+      `<strong>[Slide 7 • 4-Layer Architecture (4 Clicker Steps)]</strong><br/>
+      • Watch the stack on the left light up from bottom to top as you click:<br/>
+      • <strong>Step 1:</strong> L1 Unified Data (Internal + OEM/Transcript feeds) → <strong>Step 2:</strong> L2 Deterministic Calculation Engines → <strong>Step 3:</strong> L3 Multi-Agent Builders (TRAFFIX +$1.5M case) → <strong>Step 4:</strong> L4 Executive Consumption (FAB "AI CFO" case).`,
+      // Slide 8
+      `<strong>[Slide 8 • Operating Model (3 Clicker Steps)]</strong><br/>
+      • Contrast the top bandwidth bars (55% deck assembly vs. 85% architecture & coaching), then click through: (1) Product Pods, (2) Strategic Guardrails, and (3) Financial Coaching.<br/>
+      • <em>Verbal-Only Note for Card 3:</em> If helpful in the room, you can verbally mention Gartner's Insight Enterprises case (pairing 20 hrs/qtr digital training with a 6-week stage-gate cycle to drive a 97% surge in AI adoption and $500K in hard savings).`,
+      // Slide 9
+      `<strong>[Slide 9 • Governance Matrix (4 Clicker Steps)]</strong><br/>
+      • Walk through the 4 "Threat → Fix" controls: (1) Public HTML vs. SSO for internal Comp/M&A; (2) Slider Gaming vs. Locked WACC; (3) Multi-Agent Schema Contracts; (4) Junior Analyst Red-Teaming.`,
+      // Slide 10
+      `<strong>[Slide 10 • 30-Day Sprint & Q&A (3 Clicker Steps)]</strong><br/>
+      • <strong>Step 1:</strong> Days 1–10 Lock Templates & Agent #1 → <strong>Step 2:</strong> Days 11–20 Build Agent #2 → <strong>Step 3:</strong> Days 21–30 Reclaim 12–15 hrs/qtr & coach live trade-offs.`
+    ];
+
+    function animateCounter(elId, targetVal, suffix = '%', duration = 1000) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      const startTime = performance.now();
+      function tick(now) {
+        const progress = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = `${Math.round(targetVal * eased)}${suffix}`;
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function triggerOneShotAnimations() {
+      // Slide 2 One-Shot Animations
+      if (currentSlide === 1) {
+        if (currentStep >= 1 && !s2Step1Animated) {
+          s2Step1Animated = true;
+          setTimeout(() => {
+            document.getElementById('s2-overload-bar').style.width = '92%';
+          }, 80);
+        }
+        if (currentStep >= 2 && !s2Step2Animated) {
+          s2Step2Animated = true;
+          setTimeout(() => {
+            document.getElementById('s2-lever-1').style.width = '68%';
+            document.getElementById('s2-lever-2').style.width = '54%';
+            const bars = [
+              { id: 's2-bar-1', y: 48, h: 28 },
+              { id: 's2-bar-2', y: 36, h: 40 },
+              { id: 's2-bar-3', y: 22, h: 54 },
+              { id: 's2-bar-4', y: 10, h: 66 }
+            ];
+            bars.forEach(b => {
+              const rect = document.getElementById(b.id);
+              rect.setAttribute('y', b.y);
+              rect.setAttribute('height', b.h);
+            });
+          }, 80);
+        }
+      }
+
+      // Slide 3 One-Shot Gauge Sweep & Number Count-Up
+      if (currentSlide === 2 && !s3GaugesAnimated) {
+        s3GaugesAnimated = true;
+        setTimeout(() => {
+          document.getElementById('g-ring-15').style.strokeDashoffset = String(201 * (1 - 0.15));
+          document.getElementById('g-ring-63').style.strokeDashoffset = String(201 * (1 - 0.63));
+          document.getElementById('g-ring-60').style.strokeDashoffset = String(201 * (1 - 0.60));
+
+          const multBar = document.getElementById('g-bar-mult');
+          multBar.setAttribute('y', '14');
+          multBar.setAttribute('height', '54');
+
+          animateCounter('g-num-15', 15, '%', 1050);
+          animateCounter('g-num-63', 63, '%', 1150);
+          animateCounter('g-num-60', 60, '%', 1150);
+        }, 80);
+      }
+
+      // Slide 4 One-Shot Era Bandwidth Bar Animations
+      if (currentSlide === 3) {
+        const splits = [
+          { a: 'era-bar-1a', wa: '85%', b: 'era-bar-1b', wb: '15%' },
+          { a: 'era-bar-2a', wa: '70%', b: 'era-bar-2b', wb: '30%' },
+          { a: 'era-bar-3a', wa: '55%', b: 'era-bar-3b', wb: '45%' },
+          { a: 'era-bar-4a', wa: '15%', b: 'era-bar-4b', wb: '85%' }
+        ];
+        const idx = currentStep - 1;
+        if (!s4ErasAnimated[idx]) {
+          s4ErasAnimated[idx] = true;
+          setTimeout(() => {
+            document.getElementById(splits[idx].a).style.width = splits[idx].wa;
+            document.getElementById(splits[idx].b).style.width = splits[idx].wb;
+          }, 60);
+        }
+      }
+
+      // Slide 8 One-Shot Operating Model Bandwidth Bars
+      if (currentSlide === 7 && !s8BarsAnimated) {
+        s8BarsAnimated = true;
+        setTimeout(() => {
+          document.getElementById('s8-bar-leg1').style.width = '55%';
+          document.getElementById('s8-bar-leg2').style.width = '30%';
+          document.getElementById('s8-bar-leg3').style.width = '15%';
+          document.getElementById('s8-bar-fr1').style.width = '15%';
+          document.getElementById('s8-bar-fr2').style.width = '45%';
+          document.getElementById('s8-bar-fr3').style.width = '40%';
+        }, 80);
+      }
+    }
+
+    function getCumulativeStepsCompleted() {
+      let count = 0;
+      for (let i = 0; i < currentSlide; i++) count += slideMaxSteps[i];
+      return count + currentStep;
+    }
+
+    function applySlideStepVisuals() {
+      slides.forEach((s, idx) => s.classList.toggle('active', idx === currentSlide));
+
+      const activeSlideEl = slides[currentSlide];
+      const maxSteps = slideMaxSteps[currentSlide];
+      const items = activeSlideEl.querySelectorAll('.build-item');
+
+      items.forEach(item => {
+        const itemStep = parseInt(item.getAttribute('data-step'), 10);
+        item.classList.remove('step-future', 'step-past', 'step-current');
+        if (itemStep < currentStep) item.classList.add('step-past');
+        else if (itemStep === currentStep) item.classList.add('step-current');
+        else item.classList.add('step-future');
+      });
+
+      triggerOneShotAnimations();
+
+      // Slide 5 (index 4): Dynamic SVG Cash-Flow Chart & Automated Stress Breach on Step 4
+      if (currentSlide === 4) {
+        const sandboxCard = document.getElementById('s5-sandbox-card');
+        const badge = document.getElementById('s5-sim-mode-badge');
+        if (currentStep <= 3) {
+          document.getElementById('capex-outlay').value = 1200;
+          document.getElementById('capex-inflow').value = 480;
+          document.getElementById('capex-delay').value = 3;
+          badge.textContent = 'Step 3: Base Case (Passes)';
+          badge.style.borderColor = 'var(--accent-emerald)';
+          badge.style.color = 'var(--accent-emerald)';
+          runGuardrailSim();
+        } else if (currentStep === 4) {
+          sandboxCard.classList.remove('step-past');
+          sandboxCard.classList.add('step-current');
+          document.getElementById('capex-outlay').value = 2100;
+          document.getElementById('capex-inflow').value = 425;
+          document.getElementById('capex-delay').value = 9;
+          badge.textContent = 'Step 4: Stress Case (Breach!)';
+          badge.style.borderColor = 'var(--accent-rose)';
+          badge.style.color = 'var(--accent-rose)';
+          runGuardrailSim();
+        }
+      }
+
+      // Slide 7 (index 6): Illuminate Bounded Layer Plates on Left
+      if (currentSlide === 6) {
+        for (let p = 1; p <= 4; p++) {
+          const plate = document.getElementById(`iso-plate-${p}`);
+          if (plate) {
+            plate.style.opacity = p <= currentStep ? '1' : '0.28';
+            plate.style.transform = p === currentStep ? 'scale(1.03)' : 'scale(1)';
+            plate.style.boxShadow = p === currentStep ? '0 0 18px rgba(56,189,248,0.4)' : 'none';
+          }
+        }
+      }
+
+      document.getElementById('slide-counter').textContent =
+        `Slide ${currentSlide + 1} / ${slides.length} • Step ${currentStep} / ${maxSteps}`;
+
+      const completed = getCumulativeStepsCompleted();
+      document.getElementById('progress-fill').style.width = `${(completed / totalDeckSteps) * 100}%`;
+      document.getElementById('slide-pace').textContent = activeSlideEl.getAttribute('data-pace');
+      document.getElementById('notes-slide-title').textContent =
+        `Speaker Notes — Slide ${currentSlide + 1} (Step ${currentStep} of ${maxSteps})`;
+      document.getElementById('notes-content').innerHTML = speakerNotes[currentSlide];
+    }
+
+    function nextStepOrSlide() {
+      const maxSteps = slideMaxSteps[currentSlide];
+      if (currentStep < maxSteps) {
+        currentStep++;
+        applySlideStepVisuals();
+      } else if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        currentStep = 1;
+        applySlideStepVisuals();
+      }
+    }
+
+    function prevStepOrSlide() {
+      if (currentStep > 1) {
+        currentStep--;
+        applySlideStepVisuals();
+      } else if (currentSlide > 0) {
+        currentSlide--;
+        currentStep = slideMaxSteps[currentSlide];
+        applySlideStepVisuals();
+      }
+    }
+
+    function toggleFullScreen() {
+      const btn = document.getElementById('btn-fullscreen');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          btn.textContent = '⛶ Exit (F)';
+          btn.classList.add('active');
+          window.focus();
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          btn.textContent = '⛶ Full (F)';
+          btn.classList.remove('active');
+          window.focus();
+        }).catch(() => {});
+      }
+    }
+
+    function toggleHud() { document.body.classList.toggle('hud-hidden'); }
+    function toggleBlackout() { document.getElementById('blackout-overlay').classList.toggle('active'); }
+
+    function toggleNotes() {
+      document.getElementById('notes-drawer').classList.toggle('open');
+      document.getElementById('btn-notes').classList.toggle('active');
+    }
+
+    function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
+    function runGuardrailSim() {
+      const outlay = parseFloat(document.getElementById('capex-outlay').value);
+      const inflow = parseFloat(document.getElementById('capex-inflow').value);
+      const delay = parseFloat(document.getElementById('capex-delay').value);
+
+      document.getElementById('capex-outlay-val').textContent = `$${outlay.toLocaleString()}K`;
+      document.getElementById('capex-inflow-val').textContent = `$${inflow.toLocaleString()}K/yr`;
+      document.getElementById('capex-delay-val').textContent = `${delay} Mos`;
+
+      const delayFactor = 1 - (delay / 36);
+      const effectiveAnnual = inflow * 0.88 * delayFactor;
+      const payback = outlay / effectiveAnnual;
+      const npv = Math.round((effectiveAnnual * 3.65) - outlay);
+      const irr = (((effectiveAnnual / outlay) * 1.38) - 0.115) * 100;
+      const cleanIrr = Math.max(-5, Math.min(45, irr)).toFixed(1);
+
+      const pass = parseFloat(cleanIrr) >= 14.0 && npv > 0 && payback <= 3.2;
+
+      const irrEl = document.getElementById('sim-irr');
+      const npvEl = document.getElementById('sim-npv');
+      const pbEl = document.getElementById('sim-payback');
+      const box = document.getElementById('sim-guardrail-box');
+
+      irrEl.textContent = `${cleanIrr}%`;
+      npvEl.textContent = `${npv >= 0 ? '+' : ''}$${npv}K`;
+      pbEl.textContent = `${payback.toFixed(1)} Yrs`;
+
+      irrEl.style.color = pass ? 'var(--accent-emerald)' : 'var(--accent-rose)';
+      npvEl.style.color = npv >= 0 ? 'var(--accent-blue)' : 'var(--accent-rose)';
+
+      const zeroY = 62;
+      const pts = [];
+      const xCoords = [39, 77, 115, 153, 191];
+      for (let yr = 1; yr <= 5; yr++) {
+        const cumCash = (effectiveAnnual * yr) - outlay;
+        const scaledH = Math.min(46, Math.max(-32, Math.round(cumCash / 28)));
+        const bar = document.getElementById(`cf-bar-${yr}`);
+        if (scaledH >= 0) {
+          bar.setAttribute('y', zeroY - scaledH);
+          bar.setAttribute('height', Math.max(4, scaledH));
+          bar.setAttribute('fill', pass ? '#10b981' : '#f59e0b');
+          pts.push(`${xCoords[yr - 1]},${zeroY - scaledH}`);
+        } else {
+          bar.setAttribute('y', zeroY);
+          bar.setAttribute('height', Math.max(4, Math.abs(scaledH)));
+          bar.setAttribute('fill', '#f43f5e');
+          pts.push(`${xCoords[yr - 1]},${zeroY + Math.abs(scaledH)}`);
+        }
+      }
+      document.getElementById('cf-curve').setAttribute('points', pts.join(' '));
+
+      if (pass) {
+        box.className = 'guardrail-banner guardrail-pass';
+        box.innerHTML = '<span>✅ AUTO-APPROVED FOR STAGE-GATE: Meets all embedded FP&A hurdle guardrails.</span>';
+      } else {
+        box.className = 'guardrail-banner guardrail-fail';
+        box.innerHTML = '<span>🛑 GUARDRAIL BREACH: Fails 14% IRR floor or 3.2-Yr payback ceiling. Escalate to FP&A review.</span>';
+      }
+    }
+
+    function openDemoModal(url) {
+      document.getElementById('demo-modal').classList.add('open');
+      switchModalUrl(url);
+    }
+
+    function switchModalUrl(url) {
+      document.getElementById('demo-iframe').src = url;
+      document.getElementById('modal-url-label').textContent = url;
+      document.getElementById('modal-ext-link').href = url;
+    }
+
+    function closeDemoModal() {
+      document.getElementById('demo-modal').classList.remove('open');
+      document.getElementById('demo-iframe').src = 'about:blank';
+      window.focus();
+    }
+
+    let timerSeconds = 0;
+    let timerInterval = null;
+
+    function toggleTimer() {
+      const statusEl = document.getElementById('timer-status');
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        statusEl.textContent = '▶';
+      } else {
+        statusEl.textContent = '⏸';
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+          const secs = String(timerSeconds % 60).padStart(2, '0');
+          document.getElementById('timer-display').textContent = `${mins}:${secs} / 45:00`;
+        }, 1000);
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const blackout = document.getElementById('blackout-overlay');
+      const modalOpen = document.getElementById('demo-modal').classList.contains('open');
+
+      if (blackout.classList.contains('active')) {
+        e.preventDefault();
+        blackout.classList.remove('active');
+        return;
+      }
+
+      if (['ArrowRight', 'PageDown', 'ArrowDown', ' ', 'Enter'].includes(e.key)) {
+        if (!modalOpen) { e.preventDefault(); nextStepOrSlide(); }
+      } else if (['ArrowLeft', 'PageUp', 'ArrowUp', 'Backspace'].includes(e.key)) {
+        if (!modalOpen) { e.preventDefault(); prevStepOrSlide(); }
+      } else if (e.key === '1') {
+        e.preventDefault();
+        openDemoModal('https://prakritnepal-git.github.io/capexanalyzer/');
+      } else if (e.key === '2') {
+        e.preventDefault();
+        openDemoModal('https://prakritnepal-git.github.io/Q226_competitive_analysis/');
+      } else if (e.key === '.' || e.key.toLowerCase() === 'b') {
+        if (!modalOpen) { e.preventDefault(); toggleBlackout(); }
+      } else if (e.key.toLowerCase() === 'f') {
+        e.preventDefault(); toggleFullScreen();
+      } else if (e.key.toLowerCase() === 'h') {
+        e.preventDefault(); toggleHud();
+      } else if (e.key.toLowerCase() === 'n') {
+        e.preventDefault(); toggleNotes();
+      } else if (e.key.toLowerCase() === 't') {
+        e.preventDefault(); toggleTimer();
+      } else if (e.key.toLowerCase() === 'l') {
+        e.preventDefault(); toggleTheme();
+      } else if (e.key === 'Escape') {
+        if (modalOpen) closeDemoModal();
+      }
+    });
+
+    applySlideStepVisuals();
+  </script>
+</body>
+</html>
